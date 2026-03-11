@@ -25,7 +25,7 @@ class MainWindow(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.stack)
         #读取智能体列表
-        with open ("./agents.json", "r", encoding="utf-8") as f:
+        with open ("./configs/agents.json", "r", encoding="utf-8") as f:
             self.agents = json.load(f)
 
         self.welcome = WelcomePage(self.show_choose)

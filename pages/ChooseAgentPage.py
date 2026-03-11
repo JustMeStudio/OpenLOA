@@ -1,4 +1,5 @@
 import sys
+import webbrowser
 from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout,
     QListWidget, QListWidgetItem, QStackedWidget,
@@ -21,100 +22,102 @@ class ClickableWidget(QWidget):
 
 
 class ChooseAgentPage(QWidget):
-    def __init__(self, agents, on_agent_selected, username="窗外的、麻雀", balance=9999.99):
+    def __init__(self, agents, on_agent_selected, username="DeanFan1994"):
         super().__init__()
         self.on_agent_selected = on_agent_selected
         
-        # Main layout with header
+        # 主布局
         main_layout = QVBoxLayout(self)
         
-        # Header for user information
+        # --- 顶部 Header 修改 ---
         header = QFrame()
-        header.setFrameShape(QFrame.Box)
-        header.setFrameShadow(QFrame.Raised)
-        header.setLineWidth(2)
+        header.setObjectName("HeaderFrame") # 方便精确控制样式
         header.setStyleSheet("""
-            QFrame {
-                border: 2px solid #0078D7;
-                border-radius: 6px;
-                background-color: #E6E6FA;
+            QFrame#HeaderFrame {
+                border: 2px solid #ff7f50;
+                border-radius: 12px;
+                background-color: rgba(255, 255, 255, 0.9);
                 padding: 10px;
             }
             QLabel {
                 border: none;
                 background: none;
+                color: #333;
             }
         """)
         header_layout = QHBoxLayout(header)
         
-        # Username label
-        username_label = QLabel(f"欢迎来到智能峡谷，亲爱的召唤师:   {username}")
-        username_label.setFont(QFont("", 11, QFont.Bold))
-        header_layout.addWidget(username_label, alignment=Qt.AlignLeft)
+        # 左侧欢迎语
+        welcome_layout = QVBoxLayout()
+        username_label = QLabel(f"欢迎来到智能峡谷，亲爱的召唤师")
+        username_label.setFont(QFont("Microsoft YaHei", 12, QFont.Bold))
         
-        # Right side layout for balance and buttons
-        right_layout = QVBoxLayout()
+        status_label = QLabel("系统状态: 接入中 (OpenSource Mode)")
+        status_label.setFont(QFont("Consolas", 9))
+        status_label.setStyleSheet("color: #666;")
         
-        # Balance label
-        balance_label = QLabel(f"余额: ￥{balance:.2f}")
-        balance_label.setFont(QFont("", 11, QFont.Bold))
-        right_layout.addWidget(balance_label, alignment=Qt.AlignRight)
+        welcome_layout.addWidget(username_label)
+        welcome_layout.addWidget(status_label)
+        header_layout.addLayout(welcome_layout, stretch=1)
         
-        # Buttons layout
-        buttons_layout = QHBoxLayout()
-        recharge_button = QPushButton("充值")
-        share_button = QPushButton("分享领余额")
-        
-        # Button styling
-        recharge_button.setStyleSheet("""
+        # --- 右侧：GitHub 标星按钮 ---
+        self.star_button = QPushButton(" ⭐ 为 OpenLOA 点亮 Star ")
+        self.star_button.setCursor(Qt.PointingHandCursor)
+        self.star_button.setFixedWidth(220)
+        self.star_button.setFixedHeight(45)
+        self.star_button.setStyleSheet("""
             QPushButton {
-                background-color: #0078D7;
+                background-color: #24292e; /* GitHub 黑色主题 */
                 color: white;
-                border-radius: 4px;
-                padding: 5px 10px;
+                border-radius: 22px;
+                font-family: 'Segoe UI', 'Microsoft YaHei';
+                font-weight: bold;
+                font-size: 14px;
             }
             QPushButton:hover {
-                background-color: #005BA1;
+                background-color: #ff7f50; /* 悬浮切换为项目主色调 */
+                border: 1px solid white;
             }
         """)
-        share_button.setStyleSheet("""
-            QPushButton {
-                background-color: #0078D7;
-                color: white;
-                border-radius: 4px;
-                padding: 5px 10px;
-            }
-            QPushButton:hover {
-                background-color: #005BA1;
-            }
-        """)
+        # 链接到你的仓库
+        self.star_button.clicked.connect(lambda: webbrowser.open("https://github.com/DeanFan1994/OpenLOA"))
         
-        # Button click handlers
-        recharge_button.clicked.connect(lambda: print("充值"))
-        share_button.clicked.connect(lambda: print("分享领余额"))
-        
-        buttons_layout.addWidget(recharge_button)
-        buttons_layout.addWidget(share_button)
-        right_layout.addLayout(buttons_layout)
-        
-        header_layout.addLayout(right_layout)
+        header_layout.addWidget(self.star_button, alignment=Qt.AlignRight)
         
         main_layout.addWidget(header)
         
-        # Existing content layout
+        # --- 现有的内容布局保持不变 ---
         content_layout = QHBoxLayout()
         main_layout.addLayout(content_layout)
 
         self.menu_list = QListWidget()
-        self.menu_list.setFixedWidth(120)
-        self.menu_list.setViewMode(QListView.ListMode)
-        self.menu_list.setSpacing(5)
+        self.menu_list.setFixedWidth(130)
+        self.menu_list.setStyleSheet("""
+            QListWidget {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.7);
+            }
+            QListWidget::item {
+                padding: 15px 5px;
+                border-bottom: 1px solid #eee;
+            }
+            QListWidget::item:selected {
+                background-color: #ff7f50;
+                color: white;
+                border-radius: 5px;
+            }
+        """)
         content_layout.addWidget(self.menu_list)
 
         self.stack = QStackedWidget()
         content_layout.addWidget(self.stack)
         
         self.populate_tabs(agents)
+        
+        # 信号连接
+        self.menu_list.currentRowChanged.connect(self.stack.setCurrentIndex)
+        self.menu_list.setCurrentRow(0)
 
     def populate_tabs(self, agents):
         type_to_agents = {}

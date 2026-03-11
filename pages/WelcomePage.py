@@ -1,233 +1,112 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QGraphicsDropShadowEffect, QLineEdit, QTabWidget, QHBoxLayout, QFormLayout, QMessageBox
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QGraphicsDropShadowEffect
 from PySide6.QtGui import QMovie, QFont, QColor
 from PySide6.QtCore import Qt
-
-#登录请求
-def login():
-    return {"status": "succeed", "prompt": "登录成功"}
 
 class WelcomePage(QWidget):
     def __init__(self, switch_to_choose):
         super().__init__()
 
-        self.movie = QMovie("./assets/home/2.gif")
+        # 背景动效
+        self.movie = QMovie("./assets/home/1.gif")
         self.movie.setCacheMode(QMovie.CacheAll)
-        self.movie.setSpeed(100)
-
+        
         self.background_label = QLabel(self)
         self.background_label.setMovie(self.movie)
         self.background_label.setAlignment(Qt.AlignCenter)
         self.background_label.setScaledContents(True)
-        self.background_label.setGeometry(self.rect())
         self.movie.start()
 
+        # 主布局
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)
-        layout.setSpacing(20)
+        layout.setContentsMargins(50, 50, 50, 50)
 
-        title = QLabel("🎉 欢迎来到 《智能体联盟》")
-        title.setFont(QFont("Segoe UI", 28, QFont.Bold))
-        title.setStyleSheet("color: white;")
+        # --- 标题部分 ---
+        title = QLabel("OpenLOA")
+        title.setFont(QFont("Segoe UI", 48, QFont.Bold))
+        title.setStyleSheet("color: white; letter-spacing: 5px;")
         title.setAlignment(Qt.AlignCenter)
 
+        # 霓虹灯阴影效果
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(12)
-        shadow.setOffset(5, 5)
-        shadow.setColor(QColor(0, 0, 0, 200))
+        shadow.setBlurRadius(20)
+        shadow.setOffset(0, 0)
+        shadow.setColor(QColor(255, 127, 80, 200)) # 橙色霓虹
         title.setGraphicsEffect(shadow)
 
-        subtitle = QLabel("即刻登录，进入智能峡谷")
-        subtitle.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        subtitle.setStyleSheet("color: white;")
+        # --- 优化后的副标题样式 ---
+        subtitle = QLabel("智能体联盟 · 真正高效的智能体由你定义")
+        # 1. 字体加粗，字号稍微调大
+        subtitle.setFont(QFont("Microsoft YaHei", 16, QFont.Bold))
+        # 2. 增加半透明背景色 (rgba)，并增加圆角边衬
+        # 3. 字体颜色使用纯白，并增加字母间距
+        subtitle.setStyleSheet("""
+            color: white; 
+            background-color: rgba(0, 0, 0, 0.4); 
+            padding: 8px 20px; 
+            border-radius: 15px;
+            letter-spacing: 2px;
+        """)
         subtitle.setAlignment(Qt.AlignCenter)
+
+        # 4. 给副标题也加上强力的文字投影
         sub_shadow = QGraphicsDropShadowEffect(self)
-        sub_shadow.setBlurRadius(8)
-        sub_shadow.setOffset(3, 3)
-        sub_shadow.setColor(QColor(0, 0, 0, 200))
+        sub_shadow.setBlurRadius(15)
+        sub_shadow.setOffset(0, 0)
+        sub_shadow.setColor(QColor(0, 0, 0, 255)) # 纯黑阴影底色
         subtitle.setGraphicsEffect(sub_shadow)
 
-        watermark = QLabel("就我智己AI工作室")
-        watermark.setFont(QFont("Segoe UI", 10))
-        watermark.setStyleSheet("color: white; opacity: 0.7;")
-        watermark.setAlignment(Qt.AlignCenter)
-
-        self.tab_widget = QTabWidget()
-        self.tab_widget.setFixedWidth(400)
-        self.tab_widget.setStyleSheet("""
-            QTabWidget::pane {
-                border: 1px solid #ffffff;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-            }
-            QTabBar::tab {
-                background: #ff7f50;
-                color: white;
-                padding: 10px;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                min-width: 100px;
-            }
-            QTabBar::tab:selected {
-                background: #ff9f70;
-            }
-        """)
-
-        # 登录 Tab
-        login_tab = QWidget()
-        self.login_layout = QFormLayout()
-        self.login_layout.setSpacing(15)
-
-        self.login_phone = QLineEdit()
-        self.login_phone.setPlaceholderText("请输入手机号")
-        self.login_phone.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        self.login_password = QLineEdit()
-        self.login_password.setPlaceholderText("请输入密码")
-        self.login_password.setEchoMode(QLineEdit.Password)
-        self.login_password.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        self.login_code = QLineEdit()
-        self.login_code.setPlaceholderText("请输入验证码")
-        self.login_code.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        self.send_code_btn = QPushButton("发送")
-        self.send_code_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #ff7f50;
-                color: white;
-                border-radius: 5px;
-                padding: 8px;
-            }
-            QPushButton:hover { background-color: #ff9f70; }
-            QPushButton:pressed { background-color: #ff5f30; }
-        """)
-
-        self.code_layout = QHBoxLayout()
-        self.code_layout.addWidget(self.login_code)
-        self.code_layout.addWidget(self.send_code_btn)
-
-        # Create a container widget for the input field (password or code)
-        self.input_container = QWidget()
-        self.input_layout = QVBoxLayout(self.input_container)
-        self.input_layout.setContentsMargins(0, 0, 0, 0)
-        self.input_layout.addWidget(self.login_password)  # Start with password field
-
-        self.input_label = QLabel("密码:")
-        self.toggle_link = QLabel('<a href="#" style="color: #ff7f50; text-decoration: underline;">短信验证码登录</a>')
-        self.toggle_link.setAlignment(Qt.AlignRight)
-        self.toggle_link.setTextFormat(Qt.RichText)
-        self.toggle_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.toggle_link.linkActivated.connect(self.toggle_login_mode)
-
-        self.is_password_mode = True
-        self.login_layout.addRow("手机号:", self.login_phone)
-        self.login_layout.addRow(self.input_label, self.input_container)
-        self.login_layout.addRow("", self.toggle_link)
-        login_tab.setLayout(self.login_layout)
-
-        # 注册 Tab
-        register_tab = QWidget()
-        register_layout = QFormLayout()
-        register_layout.setSpacing(15)
-
-        self.register_phone = QLineEdit()
-        self.register_phone.setPlaceholderText("请输入手机号")
-        self.register_phone.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        self.register_password = QLineEdit()
-        self.register_password.setPlaceholderText("请输入密码")
-        self.register_password.setEchoMode(QLineEdit.Password)
-        self.register_password.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        self.register_code = QLineEdit()
-        self.register_code.setPlaceholderText("请输入验证码")
-        self.register_code.setStyleSheet("padding: 8px; border-radius: 5px; border: 1px solid #ccc;")
-
-        register_code_btn = QPushButton("发送验证码")
-        register_code_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #ff7f50;
-                color: white;
-                border-radius: 5px;
-                padding: 8px;
-            }
-            QPushButton:hover { background-color: #ff9f70; }
-            QPushButton:pressed { background-color: #ff5f30; }
-        """)
-
-        register_code_layout = QHBoxLayout()
-        register_code_layout.addWidget(self.register_code)
-        register_code_layout.addWidget(register_code_btn)
-
-        register_layout.addRow("手机号:", self.register_phone)
-        register_layout.addRow("密码:", self.register_password)
-        register_layout.addRow("验证码:", register_code_layout)
-        register_tab.setLayout(register_layout)
-
-        self.tab_widget.addTab(login_tab, "登录")
-        self.tab_widget.addTab(register_tab, "注册")
-
-        self.action_btn = QPushButton("登录")
-        self.action_btn.setFixedSize(200, 50)
+        # --- 核心交互按钮 ---
+        # 更有仪式感的按钮
+        self.action_btn = QPushButton("现在启动") 
+        self.action_btn.setFixedSize(280, 60)
+        self.action_btn.setCursor(Qt.PointingHandCursor)
         self.action_btn.setStyleSheet("""
             QPushButton {
                 color: white;
-                background-color: #ff7f50;
-                border-radius: 25px;
-                font-size: 16px;
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+                                  stop:0 rgba(255, 127, 80, 255), stop:1 rgba(255, 95, 48, 255));
+                border-radius: 30px;
+                font-size: 18px;
+                font-family: 'Microsoft YaHei';
+                font-weight: bold;
+                border: 2px solid rgba(255, 255, 255, 0.3);
             }
-            QPushButton:hover { background-color: #ff9f70; }
-            QPushButton:pressed { background-color: #ff5f30; }
+            QPushButton:hover { 
+                background-color: #ff9f70; 
+                border: 2px solid white;
+            }
+            QPushButton:pressed { 
+                background-color: #ff5f30; 
+                transform: scale(0.95);
+            }
         """)
-        self.action_btn.clicked.connect(lambda: self.handle_login(switch_to_choose))
+        self.action_btn.clicked.connect(switch_to_choose)
 
-        # Connect tab change signal to update button text
-        self.tab_widget.currentChanged.connect(self.update_button_text)
+        # --- 页脚信息 (DeanFan1994 & OpenLOA) ---
+        footer_layout = QVBoxLayout()
+        footer_layout.setSpacing(5)
+        
+        project_info = QLabel("PROJECT: OpenLOA v1.0.0-OpenSource")
+        project_info.setFont(QFont("Consolas", 10))
+        project_info.setStyleSheet("color: rgba(255, 255, 255, 0.5);")
+        project_info.setAlignment(Qt.AlignCenter)
 
-        layout.addStretch()
+        developer_info = QLabel("Developed by DeanFan1994 @ 就我智己AI工作室")
+        developer_info.setFont(QFont("Segoe UI", 10))
+        developer_info.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-style: italic;")
+        developer_info.setAlignment(Qt.AlignCenter)
+
+        footer_layout.addWidget(project_info)
+        footer_layout.addWidget(developer_info)
+
+        # 组件组装
+        layout.addStretch(3)
         layout.addWidget(title)
         layout.addWidget(subtitle)
-        layout.addSpacing(20)
-        layout.addWidget(self.tab_widget, alignment=Qt.AlignCenter)
-        layout.addSpacing(20)
+        layout.addStretch(2)
         layout.addWidget(self.action_btn, alignment=Qt.AlignCenter)
-        layout.addStretch()
-        layout.addWidget(watermark)
-
-    def update_button_text(self, index):
-        if index == 1:  # Register tab index
-            self.action_btn.setText("注册并登录")
-        else:  # Login tab index
-            self.action_btn.setText("登录")
-
-    def handle_login(self, switch_to_choose):
-        result = login()
-        if result["status"] == "succeed":
-            switch_to_choose()
-        else:
-            QMessageBox.warning(self, "登录失败", result["prompt"])
-
-    def toggle_login_mode(self):
-        # Clear the input layout safely
-        while self.input_layout.count():
-            item = self.input_layout.takeAt(0)
-            if item.widget():
-                item.widget().setParent(None)  # Remove widget without deleting
-            elif item.layout():
-                item.layout().setParent(None)  # Remove layout without deleting
-
-        if self.is_password_mode:
-            # Switch to code mode
-            self.input_layout.addLayout(self.code_layout)
-            self.input_label.setText("验证码:")
-            self.toggle_link.setText('<a href="#" style="color: #ff7f50; text-decoration: underline;">密码登录</a>')
-            self.is_password_mode = False
-        else:
-            # Switch to password mode
-            self.input_layout.addWidget(self.login_password)
-            self.input_label.setText("密码:")
-            self.toggle_link.setText('<a href="#" style="color: #ff7f50; text-decoration: underline;">短信验证码登录</a>')
-            self.is_password_mode = True
+        layout.addStretch(3)
+        layout.addLayout(footer_layout)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

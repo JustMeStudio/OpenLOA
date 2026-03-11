@@ -15,7 +15,7 @@ class Zed(QWidget):
         super().__init__()
         self.setWindowTitle("智能峡谷 - 聊天与编辑器")
         # 读取本智能体的参数信息
-        with open("./agents.json", "r", encoding="utf-8") as f:
+        with open("./configs/agents.json", "r", encoding="utf-8") as f:
             agents_list = json.load(f)
         for agent in agents_list:
             if agent["page"] == "Zed":
@@ -148,8 +148,8 @@ class Zed(QWidget):
 
     def save_and_feed(self):
         if not self.current_file_path:
-            os.makedirs("./backend/agents/projects/cache", exist_ok=True)
-            self.current_file_path = os.path.abspath("./backend/agents/projects/cache/Zed_output.txt")
+            os.makedirs("./backend/projects/cache", exist_ok=True)
+            self.current_file_path = os.path.abspath("./backend/projects/cache/Zed_output.txt")
         try:
             with open(self.current_file_path, 'w', encoding='utf-8') as f:
                 f.write(self.text_editor.toPlainText())

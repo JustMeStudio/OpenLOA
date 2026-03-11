@@ -11,7 +11,7 @@ from mcp.client.stdio import stdio_client
 from mcp.client.session import ClientSession
 from mcp import StdioServerParameters
 from mcp.client.sse import sse_client
-from agent_utils.utils import qprint
+from utils.com import qprint
 from globals import globals
 
 sys.stdout.reconfigure(encoding="utf-8", newline=None)

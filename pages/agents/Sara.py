@@ -8,7 +8,7 @@ from PySide6.QtCore import QProcess, Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap, QKeyEvent
 
 # 读取本智能体的参数信息
-with open("./agents.json", "r", encoding="utf-8") as f:
+with open("./configs/agents.json", "r", encoding="utf-8") as f:
     agents_list = json.load(f)
 for agent in agents_list:
     if agent["page"] == "Sara":
