@@ -1,0 +1,11 @@
+[
+    {"id":2, "type":"图文创作","name": "寒冰写手-艾希", "description": "撰写图文分享贴（会自己查资料扒图的那种）", "avatar": "./assets/avatar/Ashe.jpg", "page":"Ashe"},
+    {"id":3, "type":"图文创作","name": "影分身-劫", "description": "替你写汇报（会仿造你以前的文字风格的那种）", "avatar": "./assets/avatar/Zed.jpg", "page":"Zed"},
+    {"id":4, "type":"求职/招聘","name": "职位猎人-好运姐", "description": "自动投简历（自动根据你的简历内容投，各大平台投）", "avatar": "./assets/avatar/Sara.jpg", "page":"Sara"},
+    {"id":1, "type":"资源抓取","name": "智能体D", "description": "图神经网络专家", "avatar": "./assets/avatar/Riven.jpg", "page":"Ashe"},
+    {"id":5, "type":"图片生成","name": "智能体E", "description": "强化学习玩家", "avatar": "./assets/avatar/Yasuo.jpg", "page":"Ashe"},
+    {"id":6, "type":"图片生成","name": "智能体E", "description": "强化学习玩家", "avatar": "./assets/avatar/Catherine.jpg", "page":"Ashe"},
+    {"id":7, "type":"图片生成","name": "智能体E", "description": "强化学习玩家", "avatar": "./assets/avatar/Akali.jpg", "page":"Ashe"},
+    {"id":8, "type":"视频生成","name": "智能体E", "description": "强化学习玩家", "avatar": "./assets/avatar/Jinx.jpg", "page":"Ashe"},
+    {"id":9, "type":"图片生成","name": "智能体E", "description": "强化学习玩家", "avatar": "./assets/avatar/炼金.jpg", "page":"Ashe"}
+]

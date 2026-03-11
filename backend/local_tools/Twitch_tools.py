@@ -1,0 +1,509 @@
+import re
+import os   
+import requests
+import json
+import asyncio
+import base64
+import time
+import random
+import regex
+from PIL import Image
+from io import BytesIO
+from openai import OpenAI
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from urllib.parse import urlparse,urljoin
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.common.exceptions import (
+    TimeoutException, WebDriverException,
+    NoSuchElementException, ElementClickInterceptedException,
+    ElementNotInteractableException)
+from globals import globals
+
+def extract_interactive_controls(html_code):
+    soup = BeautifulSoup(html_code, 'html.parser')
+    # 过滤各个标签
+    for tag_name in ['button',"a",'textarea','select']:
+        for item in soup.find_all(tag_name):
+            # 将所有子标签去除，只留下文字
+            for child in list(item.children):
+                if not isinstance(child, str):
+                    # 使用 unwrap 保留子标签中的内容（纯文本）
+                    child.unwrap()
+            # 获取纯文本内容 移除首尾空白
+            text_content = item.get_text(strip=True)
+            item.string = text_content
+            # 移除无用属性
+            keep_attrs = ["id","name"]
+            new_attrs ={}
+            for attr in keep_attrs:
+                if item.get(attr):
+                    new_attrs[attr] = item.get(attr)
+                    break
+            item.attrs = new_attrs
+    # 清空 textarea 内部内容
+    for ta in soup.find_all('textarea'):
+        ta.clear()
+    selectors = {
+        'buttons': soup.find_all('button'),
+        'links': soup.find_all('a'),
+        'inputs': soup.find_all('input'),
+        'textareas': soup.find_all('textarea'),
+        'selects': soup.find_all('select'),
+    }
+    controls = {k: [str(tag) for tag in tags] for k, tags in selectors.items()}
+    return controls
+
+def extract_image_urls(soup, base_url):
+    img_urls = []
+    for img in soup.find_all('img'):
+        # 优先解析响应式图片 srcset
+        srcset = img.get('srcset')
+        if srcset:
+            # 每个 srcset 项格式如 "url 300w", 用逗号分隔
+            candidates = [item.strip() for item in srcset.split(',')]
+            if candidates:
+                first = candidates[0]
+                url_part = first.split()[0]
+                full_url = urljoin(base_url, url_part)
+                img_urls.append(full_url)
+            continue
+        # fallback：尝试 src 或 data-src
+        src = img.get('src') or img.get('data-src')
+        if src:
+            full_url = urljoin(base_url, src)
+            img_urls.append(full_url)
+    # 去重但保持顺序
+    return list(dict.fromkeys(img_urls))
+
+def filter_text_by_keywords(text:str, keywords:str):
+    model_config ={
+        # "base_url": "https://api.deepseek.com",
+        # "model": "deepseek-chat",
+        # # "model": "deepseek-reasoner",
+        # "api_key": "sk-76c10143bb404f6a81ac472b99f0d688"
+
+        # "api_key":"sk-121a8f5dd9f24398a51351a0b8e3e7d3", #私
+        "api_key":"sk-fbe14e00e5b544c792039d72b250e0fa", 
+        "base_url":"https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "model":"qwen-plus-2025-01-25"
+    }
+    system_prompt = ("你是一个文本内容过滤专家，能根据关键词将原文本中的相关内容保留并将无关内容去除，返回一段新的文本内容"
+    )
+    messages = [{"role": "system", "content":system_prompt}]
+    messages.append({"role": "user", "content": f"关键词是：\n{keywords}\n\n原文本是：\n{text}\n\n请你能根据关键词将原文本中的相关内容保留并将无关内容去除，返回一段新的文本内容"})
+    client = OpenAI(api_key= model_config["api_key"], base_url= model_config["base_url"],)
+    #正常识别流程
+    for i in range(3):
+        try:
+            print("正在过滤文本内容，仅保留与任务匹配的内容......")
+            completion = client.chat.completions.create(
+                model= model_config["model"],
+                messages= messages,
+            )
+            filtered_text = completion.choices[0].message.content
+            # print(f"根据'{keywords}'过滤后的文本内容:\n",filtered_text)
+            return filtered_text
+        except Exception as e:
+            print (f"文本内容过滤遇到网络问题，第{i+1}次重试中......", str(e))
+    print("由于网络原因没能完成文本内容过滤，直接当做不符合要求处理......")
+    return ""   
+
+
+#抓取页面的全部资源
+def fetch_page_resources(driver_instance_name, url):
+    driver = globals.WEB_DRIVERS[driver_instance_name]
+    time_stamp = str(get_time_stamp())
+    save_folder = f'{globals.TWITCH_WORKSPACE_PATH}/page_resources/{time_stamp}'
+    os.makedirs(save_folder, exist_ok=True)
+    save_html_path =f'{save_folder}/html_source_code_{time_stamp}.html'
+    save_controls_path = f'{save_folder}/controls_{time_stamp}.json'
+    save_image_urls_path = f'{save_folder}/image_urls_{time_stamp}.txt'
+    save_text_path = f'{save_folder}/text_{time_stamp}.txt'
+    try:
+        driver.get(url)
+        driver.implicitly_wait(10)
+        html_code = driver.page_source
+        #保存html源代码
+        with open(save_html_path, 'w', encoding='utf-8') as f:
+            f.write(html_code)
+        #保存网页交互控件json
+        controls = extract_interactive_controls(html_code)
+        with open(save_controls_path, 'w', encoding='utf-8') as f:
+            json.dump(controls, f, ensure_ascii=False, indent=2)
+        soup = BeautifulSoup(html_code, 'html.parser')
+        # 提取图片URLs，并保存
+        img_urls = extract_image_urls(soup, url)
+        with open(save_image_urls_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(img_urls))
+        # 提取纯文本，并保存
+        for scr in soup(["script", "style"]):
+            scr.decompose()
+        txt = '\n'.join(line.strip() for line in soup.get_text().splitlines() if line.strip())  
+        pattern = regex.compile(r'\{(?:[^{}]++|(?R))*+\}')           #删除{...}
+        txt = pattern.sub('', txt)
+        pattern = re.compile(r'<style\b[^>]*>.*?</style>', re.IGNORECASE | re.DOTALL)    #删除残留标签内容<style ...>...</style>
+        txt = pattern.sub('', txt)
+        with open(save_text_path, 'w', encoding='utf-8') as f:
+            f.write(txt)
+        return {
+            "result": "succeed",
+            "url": url,
+            "image_urls": save_image_urls_path,
+            "full_text_content":txt
+        }
+    except Exception as e:
+        return {"result": "failed", "failure": str(e)}
+
+
+def get_time_stamp():
+    return int(time.time())	
+
+def get_unique_save_path(local_dir, file_name):
+    # 获取文件扩展名
+    base_name, ext = os.path.splitext(file_name)
+    counter = 1
+    # 构造完整的文件路径
+    save_path = f"{local_dir}/{file_name}"
+    # 如果文件已存在，修改文件名
+    while os.path.exists(save_path):
+        # 添加数字后缀
+        new_name = f"{base_name}_{counter}{ext}"
+        save_path = f"{local_dir}/{new_name}"
+        counter += 1
+    return save_path
+
+#利用多模态大模型理解图片，避免下载无关资源
+def image_keywards_match(image_url:str, keywords:str) -> dict:
+    model_config ={
+        # "api_key":"sk-121a8f5dd9f24398a51351a0b8e3e7d3", #私
+        "api_key":"sk-fbe14e00e5b544c792039d72b250e0fa",
+        "base_url":"https://dashscope.aliyuncs.com/compatible-mode/v1",
+        # "model":"qwen2-vl-2b-instruct",
+        "model":"qwen-vl-plus-2025-01-25",        
+    }
+    system_prompt = ("你是一个基于图像理解的图片筛选过滤专家，能判断用户输入的图像是否与文本关键词相匹配：",
+                    "你的输出需要基于以下格式：\n"
+                    "-只能输出'{'match':true,'content': <你对图片真实内容的具体描述>}'或者'{'match':false}',其它输出方式都不合法！"
+    )
+    messages = [{"role": "system", "content":system_prompt}]
+    messages.append({"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_url}}, {"type": "text", "text": f"这张图的内容是否与{keywords}相关？"}]})
+    client = OpenAI(api_key= model_config["api_key"], base_url= model_config["base_url"],)
+    #svg大模型无法识别，直接当做匹配处理
+    if image_url.endswith(".svg"):
+        print("svg图片无法识别，直接当做不符合内容要求处理......")
+        return {"match":False}
+    #正常识别流程
+    for i in range(3):
+        try:
+            completion = client.chat.completions.create(
+                model= model_config["model"],
+                messages= messages,
+                response_format= {"type": "json_object"},
+            )
+            result = json.loads(completion.choices[0].message.content)
+            return result
+        except Exception as e:
+            print (f"图像内容识别过滤遇到网络问题，第{i+1}次重试中......", str(e))
+    print("由于网络原因没能完成图像识别，直接当做不符合要求处理......")
+    return {"match":False}
+
+def resolution_match(image_url: str, resolution_requirements: dict) -> dict:
+    min_pixel = resolution_requirements.get("min_pixel", None)
+    min_width = resolution_requirements.get("min_width", None)
+    min_height = resolution_requirements.get("min_height", None)
+    #svg无法处理，但是像素一般很小不能满足要求，直接丢弃
+    if image_url.endswith(".svg"):
+        print("svg图片无法识别，直接当做不符合像素要求处理......")
+        return {"match":False}
+    for _ in range(3):
+        try:
+            # 判断是否为 data URI
+            if image_url.startswith('data:'):
+                # 匹配 Base64
+                match = re.match(r'data:(.*?);base64,(.*)', image_url, re.S)
+                if not match:
+                    raise ValueError("无效的 Base64 data URI")
+                b64_data = match.group(2)
+                image_data = base64.b64decode(b64_data)
+                img = Image.open(BytesIO(image_data))
+            else:
+                # 处理 HTTP/HTTPS 链接
+                response = requests.get(image_url)
+                response.raise_for_status()
+                img = Image.open(BytesIO(response.content))
+            # 获取图像尺寸
+            width, height = img.size
+            total_pixels = width * height
+            print(f'图片宽度：{width}, 图片高度：{height}, 图片像素：{total_pixels}')
+            if min_pixel is not None and total_pixels < min_pixel:
+                return {"match":False}
+            if min_width is not None and width < min_width:
+                return {"match":False}
+            if min_height is not None and height < min_height:
+                return {"match":False}
+            return {"match":True, "size":f"{width}*{height}"}
+        except Exception as e:
+            print(f"图像分辨率检查时出错，重试中......: {e}")
+    return {"match":False}
+
+#根据图片url列表文件批量下载图片到指定路径
+def bulk_download_image(urls_file_path: list, filter_keywords: str, resolution_requirements: dict = {"min_pixel":20000,"min_width":None,"min_height":None}, 
+                              save_folder_name: str="default", quantity_limit: int= 10, timeout: int = 10):
+    save_dir = f"{globals.TWITCH_SUBMIT_PATH}/images/{save_folder_name}"
+    # 确保目标目录存在
+    os.makedirs(save_dir, exist_ok=True)
+    try:
+        with open(urls_file_path, "r", encoding="utf-8") as f:
+            urls = [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        return {"result":"failed", "failure": str(e)}
+    result = {
+        "succeed": 0,
+        "failed": 0,
+        "filtered": {"total":0, "for_content":0, "for_resolution":0},
+        "save_path": save_dir
+    }
+    for url in urls:
+        #如果分辨率不满足要求，直接跳过
+        resolution_match_result = resolution_match(url, resolution_requirements)
+        if not resolution_match_result["match"]:
+            result["filtered"]["total"]+=1
+            result["filtered"]["for_resolution"]+=1
+            print(f"本图片分辨率未达到要求，要求是{resolution_requirements}, 直接跳过下载")
+            continue
+        image_size = resolution_match_result["size"]
+        #先判断图片内容是否相关，再决定是否下载
+        keywords_match_result = image_keywards_match(url, filter_keywords)
+        if not keywords_match_result["match"]:
+            result["filtered"]["total"]+=1
+            result["filtered"]["for_content"]+=1
+            print(f"本图片内容不是关于'{filter_keywords}', 直接跳过下载")
+            continue 
+        image_content = keywords_match_result["content"]               
+        #进入图片下载流程
+        try:
+            # 情况1：url 为base64 格式
+            if url.startswith("data:image/") and ";base64," in url:
+                header, b64data = url.split(";base64,", 1)
+                # 从 header 中解析 MIME 类型和默认后缀
+                mimetype = header[len("data:"):]
+                ext = mimetype.split("/")[-1]
+                if ext.lower() not in ("jpg", "jpeg", "png", "gif", "bmp", "webp","svg"):
+                    ext = "png"
+                file_name = f"{base64.urlsafe_b64encode(os.urandom(6)).decode()[:8]}.{ext}"
+                data = base64.b64decode(b64data)
+                save_path = get_unique_save_path(save_dir, file_name)
+                with open(save_path, "wb") as out:
+                    out.write(data)
+            #情况2：普通url 
+            else:            
+                # 发起 HTTP GET 请求，设置 stream=True 以流方式读取内容
+                response = requests.get(url, stream=True, timeout=timeout)
+                response.raise_for_status()  # 若状态码非 200，则抛出异常
+                # 保存文件名获取+后缀修正+截取30个字符
+                parsed = urlparse(url)
+                path = parsed.path  # 提取 /path/to/file.jpg
+                base, ext = os.path.splitext(path)
+                if not ext:
+                    ext = ".jpg"
+                file_name = (os.path.basename(base) + ext)[-10:]
+                if file_name.split(".")[-1] not in ["jpg", "jpeg", "png", "gif", "bmp", "webp","svg"]:
+                    file_name =(file_name +".jpg")[-10:]
+                # 保存文件名避重
+                save_path = get_unique_save_path(save_dir, file_name)
+                # 写入图片内容到文件
+                with open(save_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:  # filter out keep-alive chunks
+                            f.write(chunk)
+            result["succeed"]+=1
+            print(f"✅ 恭喜你，共计成功下载图片{result["succeed"]}张（总目标{quantity_limit}张）！")
+            #将下载到的图片资源导入待提交资源包
+            globals.TWITCH_SUBMIT_METADATA.append({"file_type:":"image", 
+                                                   "size":image_size, 
+                                                   "content":filter_keywords+f"({image_content})", 
+                                                #    "local_file_path":save_path, 
+                                                   "url": "base64" if url.startswith("data:image/") and ";base64," in url else url
+                                                   })
+        except requests.exceptions.RequestException as e:
+            print(f"下载失败: {e}")
+            result["failed"]+=1
+        except OSError as e:
+            print(f"写入文件失败: {e}")
+            result["failed"]+=1
+        #每次尝试下载以后，随机等待一段时间，反爬（开启图片内容检测时不需要，因为识别过程已造成延迟）
+        if not filter_keywords:
+            time.sleep(random.uniform(2, 5))
+            print("⏳ 战术性反爬等待中......")
+        #数量限制触发
+        if quantity_limit :
+            if result["succeed"] >= quantity_limit :     #多下载点，防止无关图片太多
+                break
+    return result
+
+def open_browser_and_navigate_to_url(url: str, driver_instance_name: str = "driver_1", browser_type: str = "chrome", headless: bool = True, timeout:int=10):
+    name = browser_type.strip().lower()
+    try:
+        if name == "chrome":
+            from selenium.webdriver.chrome.options import Options
+            options = Options()
+            options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            options.add_argument('--log-level=3')
+            options.add_argument('--disable-logging')     
+            options.add_argument('--ignore-certificate-errors')
+            options.add_argument('--ignore-ssl-errors')  
+            if headless:
+                options.add_argument("--headless")
+            driver = webdriver.Chrome(service=ChromeService(), options=options)
+        elif name == "firefox":
+            from selenium.webdriver.firefox.options import Options
+            options = Options()
+            if headless:
+                options.add_argument("-headless")
+            driver = webdriver.Firefox(service=FirefoxService(), options=options)
+        elif name == "edge":
+            from selenium.webdriver.edge.service import Service as EdgeService
+            from selenium.webdriver.edge.options import Options
+            options = Options()
+            if headless:
+                options.add_argument("headless")
+            driver = webdriver.Edge(service=EdgeService(), options=options)
+        else:
+            raise ValueError(f"Unsupported browser: {browser_type}")
+        # 基本设置
+        driver.maximize_window()
+        globals.WEB_DRIVERS[driver_instance_name] = driver
+        #导航到指定url
+        try:
+            driver.get(url)
+            WebDriverWait(driver, timeout).until(lambda d: d.execute_script("return document.readyState") == "complete")
+        except TimeoutException as e:
+            return { "result": "failed to navigate", "failure": f"Timeout waiting for document.readyState to be complete" }
+        except WebDriverException as e:
+            return { "result": "failed to navigate", "failure": f"WebDriver error" }
+        except KeyError as e:
+            return { "result": "failed to navigate", "failure": f"Driver instance not opened: {driver_instance_name}" }
+        #成功跳转到url后即抓取网页资源备用
+        fetch_result = fetch_page_resources(driver_instance_name, url)
+        if fetch_result["result"] == "succeed":
+            return { "result": "succeed", "driver_instance_name": driver_instance_name, "url": url, "resources_on_this_page": fetch_result}
+        else:
+            return { "result": "successfully navigated but failed to fetch resources on this page","failure": fetch_result["failure"], "solution":"try to refresh this page" }
+    except (WebDriverException, ValueError) as e:
+        return {"result": "failed to open the browser", "failure":str(e)}
+
+async def fetch_online_text_by_keywords(keywords:str):
+    url = f"https://www.baidu.com/s?wd={keywords}"
+    page_fetch_result = open_browser_and_navigate_to_url(url)
+    #抓取结果
+    if page_fetch_result["result"] != "succeed":
+        return {"result":"failed", "failure": page_fetch_result["failure"]}
+    #判断文本内容与任务是否相关，并抄送到待提交资源文件夹，录入待提交资源metadata
+    submit_path = globals.TWITCH_SUBMIT_PATH
+    os.makedirs(f"{submit_path}/text", exist_ok=True)
+    filtered_text =  filter_text_by_keywords(page_fetch_result["resources_on_this_page"]["full_text_content"], keywords)
+    copy_text_path = f"{submit_path}/text/text_{keywords}.txt"
+    with open(copy_text_path, 'w', encoding='utf-8') as f:
+        f.write(filtered_text)
+        print("✅ 已抄送1篇相关文本内容至待提交资源文件夹！")
+        #录入待提交资源metadata
+        globals.TWITCH_SUBMIT_METADATA.append({"file_type":"text", "local_file_path":copy_text_path, "content":filtered_text ,"url": url})
+    return {"result":"succeed", 
+            # "txt_save_path":copy_text_path, 
+            "relavent_content":filtered_text}
+
+async def fetch_online_images_by_keywords(keywords:str, resolution_requirements: dict = {"min_pixel":20000,"min_width":200,"min_height":200}, 
+                              save_folder_name: str="default", quantity_limit: int= 3, ):
+    url = f"https://image.baidu.com/search/index?word={keywords}"
+    page_fetch_result = open_browser_and_navigate_to_url(url)
+    #抓取结果
+    if page_fetch_result["result"] != "succeed":
+        return {"result":"failed", "failure": page_fetch_result["failure"]}
+    result = bulk_download_image(
+                urls_file_path=page_fetch_result["resources_on_this_page"]["image_urls"], 
+                filter_keywords=keywords, 
+                resolution_requirements=resolution_requirements, 
+                save_folder_name=save_folder_name, 
+                quantity_limit=quantity_limit + 2
+            )
+    return result
+
+
+# 注册工具表
+tool_registry = {
+    "fetch_online_text_by_keywords":fetch_online_text_by_keywords,
+    "fetch_online_images_by_keywords": fetch_online_images_by_keywords,
+}
+
+# 注册工具详情
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "fetch_online_text_by_keywords",
+            "description": "根据关键词在网络上抓取相关文本信息并保存在本地",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "keywords": {
+                        "type": "string",
+                        "description": "检索关键词"
+                    },
+                },
+                "required": ["keywords"]
+            }
+        }
+    },      
+    {
+        "type": "function",
+        "function": {
+            "name": "fetch_online_images_by_keywords",
+            "description": "根据关键词在网络上抓取图片内容并保存在本地",
+            "parameters": {
+            "type": "object",
+            "properties": {
+                "keywords": {
+                "type": "string",
+                "description": "图片关键词",
+                },
+                "resolution_requirements":{
+                "type": "object",
+                "description": "所需要的图片像素，宽度和高度要求，用于跳过下载不符合要求的图片",
+                "properties":{
+                    "min_pixel":{
+                    "type": "integer",
+                    "description": "最小像素总数要求（宽×高）"
+                    },
+                    "min_width":{
+                    "type": "integer",
+                    "description": "最小宽度要求"
+                    },
+                    "min_height":{
+                    "type": "integer",
+                    "description": "最小高度要求"
+                    },
+                "default": {"min_pixel":20000,"min_width":200,"min_height":200}
+                }
+                },
+                "save_folder_name": {
+                "type": "string",
+                "description": "本地保存图片的目标文件夹名",
+                "default": "default"
+                },
+                "quantity_limit": {
+                "type": "integer",
+                "description": "下载的图片数量上限（只计入成功下载的图片数量）",
+                "default": 3
+                },
+            },
+            "required": ["keywords"]
+            }
+        }
+    }
+]
