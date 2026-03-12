@@ -12,11 +12,15 @@ from PySide6.QtGui import QFont, QPixmap
 # 导入其它页面
 from pages.ChooseAgentPage import ChooseAgentPage
 from pages.WelcomePage import WelcomePage
+from pages.i18n import get_i18n_config
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("智能体联盟")
+        self.setWindowTitle("OpenLOA - League of Agents")
+
+        # 初始化I18n配置
+        get_i18n_config()
 
         # 设置固定窗口大小，例如 800x600
         self.resize(1200, 600)
@@ -28,8 +32,10 @@ class MainWindow(QWidget):
         with open ("./configs/agents.json", "r", encoding="utf-8") as f:
             self.agents = json.load(f)
 
-        self.welcome = WelcomePage(self.show_choose)
+        # 先创建ChooseAgentPage，这样可以传递给WelcomePage
         self.choose = ChooseAgentPage(self.agents, self.on_agent_chosen)
+        # 创建WelcomePage时传递ChooseAgentPage的引用
+        self.welcome = WelcomePage(self.show_choose, self.choose)
         self.interaction = QWidget()  # 占位页
 
         self.stack.addWidget(self.welcome)

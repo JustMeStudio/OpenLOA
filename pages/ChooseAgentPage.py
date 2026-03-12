@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont, QPixmap, QCursor
+from pages.i18n import get_current_language, get_text
 
 
 class ClickableWidget(QWidget):
@@ -25,6 +26,8 @@ class ChooseAgentPage(QWidget):
     def __init__(self, agents, on_agent_selected, username="JustMeStudio"):
         super().__init__()
         self.on_agent_selected = on_agent_selected
+        self.language = get_current_language()
+        self.agents = agents
         
         # 主布局
         main_layout = QVBoxLayout(self)
@@ -47,21 +50,21 @@ class ChooseAgentPage(QWidget):
         """)
         header_layout = QHBoxLayout(header)
         
-        # 左侧欢迎语
+        # 左侧欢迎语 - 保存引用以便后续更新
         welcome_layout = QVBoxLayout()
-        username_label = QLabel(f"欢迎来到智能峡谷，亲爱的召唤师")
-        username_label.setFont(QFont("Microsoft YaHei", 12, QFont.Bold))
+        self.username_label = QLabel(get_text('welcome_message', self.language))
+        self.username_label.setFont(QFont("Microsoft YaHei", 12, QFont.Bold))
         
-        status_label = QLabel("系统状态: 接入中 (OpenSource Mode)")
-        status_label.setFont(QFont("Consolas", 9))
-        status_label.setStyleSheet("color: #666;")
+        self.status_label = QLabel(get_text('system_status', self.language))
+        self.status_label.setFont(QFont("Consolas", 9))
+        self.status_label.setStyleSheet("color: #666;")
         
-        welcome_layout.addWidget(username_label)
-        welcome_layout.addWidget(status_label)
+        welcome_layout.addWidget(self.username_label)
+        welcome_layout.addWidget(self.status_label)
         header_layout.addLayout(welcome_layout, stretch=1)
         
         # --- 右侧：GitHub 标星按钮 ---
-        self.star_button = QPushButton(" ⭐ 为 OpenLOA 点亮 Star ")
+        self.star_button = QPushButton(get_text('star_button', self.language))
         self.star_button.setCursor(Qt.PointingHandCursor)
         self.star_button.setFixedWidth(220)
         self.star_button.setFixedHeight(45)
@@ -184,3 +187,12 @@ class ChooseAgentPage(QWidget):
 
         self.menu_list.currentRowChanged.connect(self.stack.setCurrentIndex)
         self.menu_list.setCurrentRow(0)
+
+    def update_language(self, new_language):
+        """更新页面语言"""
+        self.language = new_language
+        
+        # 更新Header中的文本
+        self.username_label.setText(get_text('welcome_message', new_language))
+        self.status_label.setText(get_text('system_status', new_language))
+        self.star_button.setText(get_text('star_button', new_language))
