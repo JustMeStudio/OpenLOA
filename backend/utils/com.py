@@ -31,8 +31,10 @@ async def chat(model_config, system_prompt: str = "", tools=[], tool_registry={}
     qprint("============隐藏命令列表 ============\n",
             "\"-clear\" 清除上下文\n",
             "\"-read <file_path>\" 读取外部文本作为输入\n",
+            "\"-exit\" 退出对话\n",
+            "====================================\n"
         )
-    qprint("下面轮到你说话了，召唤师")
+    qprint("下面轮到你说话了，召唤师~")
     while True:
         #强制utf-8接收输入内容
         user_input = sys.stdin.buffer.readline().decode('utf-8').strip()

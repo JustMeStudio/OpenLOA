@@ -12,9 +12,12 @@ from globals import globals
 
 #-----------------API KEY配置区域--------------------------------
 writer_model_config = load_model_config("Zed_writer_model_config")
+Zed_embedding_model_config = load_model_config("Zed_embedding_model_config")
 # 测试打印一下
 if writer_model_config:
     print(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {writer_model_config.get('model')}")
+if Zed_embedding_model_config:
+    print(f"(向量数据库)成功加载配置，正在使用模型: {Zed_embedding_model_config.get('model')}")
 #------------------------初始化向量数据库---------------------------
 collection_name = "Zed"
 
@@ -29,8 +32,8 @@ qprint("向量数据库读取成功！")
 #创建Open AI 客户端
 qprint("正在创建OpenAI客户端......")
 oa_client = OpenAI(
-    api_key= "sk-121a8f5dd9f24398a51351a0b8e3e7d3", 
-    base_url= "https://dashscope.aliyuncs.com/compatible-mode/v1" 
+    api_key= Zed_embedding_model_config.get("api_key"), 
+    base_url= Zed_embedding_model_config.get("base_url") 
 )
 qprint("OpenAI客户端创建成功......")    
 
@@ -40,7 +43,7 @@ qprint("OpenAI客户端创建成功......")
 #API embedding
 def embed_api(text:str, oa_client) -> list:
     completion = oa_client.embeddings.create(
-        model="text-embedding-v4",
+        model= Zed_embedding_model_config.get("model"),
         input= text,
         dimensions=2048, # 指定向量维度（仅 text-embedding-v3及 text-embedding-v4支持该参数）
         encoding_format="float"

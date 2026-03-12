@@ -5,11 +5,9 @@ import json
 import time 
 import asyncio
 from utils.com import qprint, chat
-from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers
+from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers, load_all_tools_from_local_toolboxes
 from utils.config import load_model_config
 from globals import globals
-# self-defined tools import
-from tools import Zed_tools
 
 # 防止前端输出乱码
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
@@ -55,9 +53,17 @@ async def main():
         # os.makedirs(project_path, exist_ok=True)   
 
         #声明本地自定义tools
-        local_tools, local_tools_registry = Zed_tools.tools, Zed_tools.tool_registry
+        local_tool_boxes = [
+            "Zed_tools",
+        ]
+        local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_tool_boxes)
         #声明本地部署MCP Server + SSE远端MCP Server
         mcp_servers = [
+            # 以下为示例写法
+            # MCPToolSession("npx", ["-y", "@modelcontextprotocol/server-filesystem", "./Twitch_workspace"]),   #文件系统控制（npx包）
+            # MCPToolSession("uvx", ["--index-url","https://pypi.tuna.tsinghua.edu.cn/simple","mcp-pandoc"]),    #标记文本格式互转 (uvx包)    
+            # MCPToolSession("npx", ["-y", "./local_servers/12306-mcp"]),   #火车票查询（本地包)
+            # MCPToolSession(sse_url="https://mcp-youxuan.baidu.com/mcp/sse?key=<your api key>"),   #百度优选MCP(SSE链接) 
         ]
         mcp_tools, mcp_registry, mcp_sessions = await load_all_tools_from_MCP_servers(mcp_servers) 
         #合并工具箱  

@@ -72,8 +72,8 @@ def load_all_tools_from_local_toolboxes(local_toolboxes=[]):
     mcp_tools,mcp_registry = [],{}
     for toolbox in local_toolboxes:
         # qprint(f"--------------------正在获取来自本地自定义{toolbox}的工具-----------------------------")
-        if os.path.exists(f'./local_tools/{toolbox}.py'):
-            module_path = f"local_tools.{toolbox}"
+        if os.path.exists(f'./tools/{toolbox}.py'):
+            module_path = f"tools.{toolbox}"
         elif os.path.exists(f'./{toolbox}.py'):
             module_path = f"{toolbox}"
         else:

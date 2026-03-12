@@ -6,10 +6,9 @@ import time
 import asyncio
 from utils.config import load_model_config
 from utils.com import qprint, chat
-from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers
+from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers, load_all_tools_from_local_toolboxes
 from globals import globals
-# self-defined tools import
-from tools import Sara_tools
+
 
 # 防止前端输出乱码
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
@@ -19,6 +18,7 @@ agent_model_config = load_model_config("Sara_agent_model_config")
 # 测试打印一下
 if agent_model_config:
     print(f"成功加载配置，正在使用模型: {agent_model_config.get('model')}")
+
 #-----------------------system prompt config-------------------------------------
 system_prompt = """你是'职位猎人-好运姐'，你能根据用户的简历和用户对需求岗位的补充指示，前往BOSS直聘帮用户寻找匹配的岗位，并投递简历（向BOSS打招呼）
 当用户发起会话时，你需要按照以下流程工作：
@@ -54,14 +54,17 @@ async def main():
         # os.makedirs(project_path, exist_ok=True)   
 
         #声明本地自定义tools
-        local_tools, local_tools_registry = Sara_tools.tools, Sara_tools.tool_registry
+        local_tool_boxes = [
+            "Sara_tools",
+        ]
+        local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_tool_boxes)
         #声明本地部署MCP Server + SSE远端MCP Server
         mcp_servers = [
             # 以下为示例写法
-            # MCPToolSession("npx", ["-y", "@modelcontextprotocol/server-filesystem", "./Twitch_workspace"]),   #文件系统控制
-            # MCPToolSession("uvx", ["--index-url","https://pypi.tuna.tsinghua.edu.cn/simple","mcp-pandoc"]),    #标记文本格式互转     
-            # MCPToolSession("npx", ["-y", "./local_servers/12306-mcp"]),   #火车票查询
-            # MCPToolSession(sse_url="https://mcp-youxuan.baidu.com/mcp/sse?key=<your api key>"),   #百度优选MCP(SSE) 
+            # MCPToolSession("npx", ["-y", "@modelcontextprotocol/server-filesystem", "./Twitch_workspace"]),   #文件系统控制（npx包）
+            # MCPToolSession("uvx", ["--index-url","https://pypi.tuna.tsinghua.edu.cn/simple","mcp-pandoc"]),    #标记文本格式互转 (uvx包)    
+            # MCPToolSession("npx", ["-y", "./local_servers/12306-mcp"]),   #火车票查询（本地包)
+            # MCPToolSession(sse_url="https://mcp-youxuan.baidu.com/mcp/sse?key=<your api key>"),   #百度优选MCP(SSE链接) 
         ]
         mcp_tools, mcp_registry, mcp_sessions = await load_all_tools_from_MCP_servers(mcp_servers) 
         #合并工具箱  
