@@ -60,7 +60,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/DeanFan1994/OpenLOA.git
+git clone https://github.com/JustMeStudio/OpenLOA.git
 cd OpenLOA
 
 # 安装依赖
@@ -782,8 +782,8 @@ async def main():
 
 - 📧 Email: fdshiwoa@gmail.com
 - 💬 微信: fdshiwoa
-- 💬 GitHub Discussions: [在此提问](https://github.com/DeanFan1994/OpenLOA/discussions)
-- 🐛 Issue Tracker: [报告问题](https://github.com/DeanFan1994/OpenLOA/issues)
+- 💬 GitHub Discussions: [在此提问](https://github.com/JustMeStudio/OpenLOA/discussions)
+- 🐛 Issue Tracker: [报告问题](https://github.com/JustMeStudio/OpenLOA/issues)
 
 ---
 

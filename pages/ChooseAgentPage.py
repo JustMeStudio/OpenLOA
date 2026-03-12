@@ -22,7 +22,7 @@ class ClickableWidget(QWidget):
 
 
 class ChooseAgentPage(QWidget):
-    def __init__(self, agents, on_agent_selected, username="DeanFan1994"):
+    def __init__(self, agents, on_agent_selected, username="JustMeStudio"):
         super().__init__()
         self.on_agent_selected = on_agent_selected
         
@@ -80,7 +80,7 @@ class ChooseAgentPage(QWidget):
             }
         """)
         # 链接到你的仓库
-        self.star_button.clicked.connect(lambda: webbrowser.open("https://github.com/DeanFan1994/OpenLOA"))
+        self.star_button.clicked.connect(lambda: webbrowser.open("https://github.com/JustMeStudio/OpenLOA"))
         
         header_layout.addWidget(self.star_button, alignment=Qt.AlignRight)
         

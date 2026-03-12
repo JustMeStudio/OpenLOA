@@ -60,7 +60,7 @@ Clone the project and install required packages:
 
 ```bash
 # Clone the project
-git clone https://github.com/DeanFan1994/OpenLOA.git
+git clone https://github.com/JustMeStudio/OpenLOA.git
 cd OpenLOA
 
 # Install dependencies
@@ -782,8 +782,8 @@ We welcome all forms of contributions! Including but not limited to:
 
 - 📧 Email: fdshiwoa@gmail.com
 - 💬 WeChat: fdshiwoa
-- 💬 GitHub Discussions: [Ask Here](https://github.com/DeanFan1994/OpenLOA/discussions)
-- 🐛 Issue Tracker: [Report Issues](https://github.com/DeanFan1994/OpenLOA/issues)
+- 💬 GitHub Discussions: [Ask Here](https://github.com/JustMeStudio/OpenLOA/discussions)
+- 🐛 Issue Tracker: [Report Issues](https://github.com/JustMeStudio/OpenLOA/issues)
 
 ---
 

@@ -82,7 +82,7 @@ class WelcomePage(QWidget):
         """)
         self.action_btn.clicked.connect(switch_to_choose)
 
-        # --- 页脚信息 (DeanFan1994 & OpenLOA) ---
+        # --- 页脚信息 (JustMeStudio & OpenLOA) ---
         footer_layout = QVBoxLayout()
         footer_layout.setSpacing(5)
         
@@ -91,7 +91,7 @@ class WelcomePage(QWidget):
         project_info.setStyleSheet("color: rgba(255, 255, 255, 0.5);")
         project_info.setAlignment(Qt.AlignCenter)
 
-        developer_info = QLabel("Developed by DeanFan1994 @ 就我智己AI工作室")
+        developer_info = QLabel("Developed by JustMeStudio @ 就我智己AI工作室")
         developer_info.setFont(QFont("Segoe UI", 10))
         developer_info.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-style: italic;")
         developer_info.setAlignment(Qt.AlignCenter)
