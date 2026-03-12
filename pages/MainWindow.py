@@ -42,7 +42,7 @@ class MainWindow(QWidget):
     def on_agent_chosen(self, agent): 
         # 动态加载对应智能体的页面
         page_module = import_module(f"pages.agents.{agent['page']}")
-        PageClass = getattr(page_module, agent["page"])
+        PageClass = getattr(page_module, agent["name"])
         page = PageClass()
         # 替换第三页
         self.stack.removeWidget(self.interaction)

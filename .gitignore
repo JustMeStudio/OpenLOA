@@ -3,6 +3,9 @@
 /backend/projects/
 /backend/chroma_db/
 
+# 忽略包含私密 Key 的真实配置文件
+./configs/models.yaml
+
 ### --- Python 常见缓存与环境 ---
 # 字节码文件
 __pycache__/

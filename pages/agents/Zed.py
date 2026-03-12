@@ -18,8 +18,8 @@ class Zed(QWidget):
         with open("./configs/agents.json", "r", encoding="utf-8") as f:
             agents_list = json.load(f)
         for agent in agents_list:
-            if agent["page"] == "Zed":
-                self.name = agent["name"]
+            if agent["name"] == "Zed":
+                self.name = agent["nick_name"]
                 self.avatar = agent["avatar"]
         self.user_avatar = "./assets/avatar/蛮子.jpg"
         self.current_file_path = None

@@ -1,0 +1,19 @@
+Zed_agent_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"
+
+Zed_writer_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"
+
+Sara_agent_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"
+
+Sara_job_filter_generate_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"

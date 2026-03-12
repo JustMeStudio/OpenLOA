@@ -11,8 +11,8 @@ from PySide6.QtGui import QPixmap, QKeyEvent
 with open("./configs/agents.json", "r", encoding="utf-8") as f:
     agents_list = json.load(f)
 for agent in agents_list:
-    if agent["page"] == "Sara":
-        name = agent["name"]
+    if agent["name"] == "Sara":
+        name = agent["nick_name"]
         avatar = agent["avatar"]
 
 class ChatBubble(QWidget):

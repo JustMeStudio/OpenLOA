@@ -6,6 +6,7 @@ import time
 import asyncio
 from utils.com import qprint, chat
 from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers
+from utils.config import load_model_config
 from globals import globals
 # self-defined tools import
 from tools import Zed_tools
@@ -14,12 +15,10 @@ from tools import Zed_tools
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
 
 #--------------------------API KEY config-------------------------------------------
-agent_model_config = {
-    "base_url": "https://api.deepseek.com",
-    "model": "deepseek-chat",
-    # "model": "deepseek-reasoner",
-    "api_key": "sk-76c10143bb404f6a81ac472b99f0d688"
-}
+agent_model_config = load_model_config("Zed_agent_model_config")
+# 测试打印一下
+if agent_model_config:
+    print(f"成功加载配置，正在使用模型: {agent_model_config.get('model')}")
 
 #-----------------------system prompt config-------------------------------------
 system_prompt = (

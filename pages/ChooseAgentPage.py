@@ -163,7 +163,7 @@ class ChooseAgentPage(QWidget):
                 pix.setPixmap(QPixmap(ag['avatar']).scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
                 top_layout.addWidget(pix, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
-                name = QLabel(ag['name'])
+                name = QLabel(ag["nick_name"])
                 name.setFont(QFont("", 11, QFont.Bold))
                 desc = QLabel(ag['description'])
                 desc.setWordWrap(True)

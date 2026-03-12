@@ -1,0 +1,19 @@
+Zed_agent_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "your api key"
+
+Zed_writer_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "your api key"
+
+Sara_agent_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "your api key"
+
+Sara_job_filter_generate_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "your api key"
