@@ -7,7 +7,7 @@ class WelcomePage(QWidget):
         super().__init__()
 
         # 背景动效
-        self.movie = QMovie("./assets/home/1.gif")
+        self.movie = QMovie("./assets/home/2.gif")
         self.movie.setCacheMode(QMovie.CacheAll)
         
         self.background_label = QLabel(self)

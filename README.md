@@ -1,12 +1,14 @@
 <div align="center">
 
-**[🇨🇳 中文](README.md) | [🇺🇸 English](README_EN.md)**
+**[🇨🇳 中文](README_ZH.md) | [🇺🇸 English](README.md)**
 
 </div>
 
 ---
 
-# 🤖 OpenLOA - League of Agents (智能体联盟)
+# 🤖 OpenLOA - League of Agents
+
+![OpenLOA Banner](./assets/hub/banner_en.png)
 
 <div align="center">
 
@@ -15,123 +17,123 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square)](CONTRIBUTING.md)
 
-**一个开源的 AI Agent 开发与应用框架**  
-*让每个开发者都能轻松创建、分享和部署生产级别的智能体*
+**An Open-Source AI Agent Development & Application Framework**  
+*Empower every developer to easily create, share, and deploy production-grade intelligent agents*
 
-[功能展示](#-功能特性) • [快速开始](#-快速开始) • [自定义Agent](#-自定义你的agent) • [文档](#-项目结构)
+[Features](#-features) • [Quick Start](#-quick-start) • [Custom Agent](#-customize-your-agent) • [Docs](#-project-structure)
 
 </div>
 
 ---
 
-## 🎯 项目愿景
+## 🎯 Vision
 
-**智能体联盟 (League of Agents, OpenLOA)** 是一个开源的 AI Agent 开发与应用框架。我们相信，随着大语言模型的发展，Agent 将成为连接 AI 和真实世界的桥梁。
+**OpenLOA (League of Agents)** is an open-source AI Agent development and application framework. We believe that as Large Language Models evolve, Agents will become the bridge connecting AI to the real world.
 
-我们的使命是：
-- ✨ 降低 Agent 的开发门槛，让更多开发者参与其中
-- 🚀 提供开箱即用的 GUI 和 TUI 界面
-- 🛠️ 为开发者提供完整的工具链和最佳实践
-- 🌍 建立一个繁荣的 Agent 生态，共同创造更强大的 AI 应用
-
----
-
-## ✨ 功能特性
-
-| 特性 | 描述 |
-|------|------|
-| 🎨 **双界面支持** | 同时支持现代化 GUI（PySide6）和高效 TUI 界面 |
-| 🧠 **灵活的Agent框架** | 基于 LLM + Tools 的模块化设计 |
-| 🔧 **工具包系统** | 提供丰富的工具库，支持自定义扩展 |
-| ⚙️ **多模型支持** | 支持 OpenAI、Claude、本地模型等多种 LLM |
-| 📊 **持久化存储** | 集成 ChromaDB 向量数据库 |
-| 🤝 **MCP 协议** | 支持 Model Context Protocol 协议 |
-| 🎯 **低代码开发** | 配置驱动的 Agent 生成流程 |
+Our Mission:
+- ✨ Lower the barrier to Agent development and enable more developers to participate
+- 🚀 Provide out-of-the-box GUI and TUI interfaces
+- 🛠️ Provide developers with a complete toolchain and best practices
+- 🌍 Build a thriving Agent ecosystem and create more powerful AI applications together
 
 ---
 
-## 🚀 快速开始
+## ✨ Features
 
-### 1️⃣ 安装依赖
+| Feature | Description |
+|---------|-------------|
+| 🎨 **Dual Interface Support** | Support for modern GUI (PySide6) and efficient TUI interfaces |
+| 🧠 **Flexible Agent Framework** | Modular design based on LLM + Tools |
+| 🔧 **Tool Package System** | Rich tool library with custom extension support |
+| ⚙️ **Multi-Model Support** | Support for OpenAI, Claude, local models and more |
+| 📊 **Persistent Storage** | Integrated ChromaDB vector database |
+| 🤝 **MCP Protocol** | Support for Model Context Protocol |
+| 🎯 **Low-Code Development** | Configuration-driven Agent generation process |
 
-首先，克隆项目并安装必要的依赖包：
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Install Dependencies
+
+Clone the project and install required packages:
 
 ```bash
-# 克隆项目
+# Clone the project
 git clone https://github.com/DeanFan1994/OpenLOA.git
 cd OpenLOA
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2️⃣ 配置模型 API
+### 2️⃣ Configure Model API
 
-编辑 `./configs/models.yaml` 文件，为每个 Agent 及其工具配置模型和 API Key：
+Edit `./configs/models.yaml` to configure models and API keys for each Agent:
 
 ```yaml
-# Zed Agent 配置
+# Zed Agent Configuration
 Zed_agent_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
 Zed_writer_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
-# Sara Agent 配置
+# Sara Agent Configuration
 Sara_agent_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
 Sara_job_filter_generate_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
-# 你的自定义 Agent 配置
+# Your Custom Agent Configuration
 MyCustomAgent_model_config:
   base_url: "https://api.openai.com/v1"
   model: "gpt-4"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 ```
 
-> 💡 **提示**：
-> - **Agent 可以有多个模型配置**：不同的任务可以使用不同的模型（如：主要任务用 `deepseek-chat`，复杂推理用 `deepseek-reasoner`）
-> - **命名规范**：`{AgentName}_{task_name}_model_config`
-> - **支持多个提供商**：可以同时配置 OpenAI、Deepseek、Anthropic 等不同的 API 服务商
-> - **在 Agent 代码中引用**：在你的 Agent 代码中加载对应的配置即可
+> 💡 **Tips**:
+> - **Agents can have multiple model configurations**: Different tasks can use different models
+> - **Naming convention**: `{AgentName}_{task_name}_model_config`
+> - **Multiple providers**: Configure OpenAI, Deepseek, Anthropic and other providers simultaneously
+> - **Reference in Agent code**: Load corresponding configuration in your Agent code
 
-### 3️⃣ 启动应用
+### 3️⃣ Launch Application
 
-#### 📱 启动 GUI 版本（推荐新手）
+#### 📱 Launch GUI Version (Recommended for beginners)
 ```bash
 python app_GUI.py
 ```
 
-#### 🖥️ 启动 TUI 版本（推荐高级用户）
+#### 🖥️ Launch TUI Version (Recommended for advanced users)
 ```bash
 python app_TUI.py
 ```
 
 <div align="center">
 
-**就这么简单！三步即可启动你的第一个 Agent！** 🎉
+**That's it! Launch your first Agent in just three steps!** 🎉
 
 </div>
 
 ---
 
-## 🎨 自定义你的 Agent
+## 🎨 Customize Your Agent
 
-OpenLOA 采用模块化设计，让你可以轻松定制属于自己的 Agent。以下是完整的创建流程：
+OpenLOA uses modular design to let you easily customize your own Agent. Here's the complete creation process:
 
-### 第一步：编写 Agent 主体
+### Step 1: Write Agent Core
 
-在 `./backend/` 目录下创建你的 Agent 主文件：
+Create your Agent main file in `./backend/`:
 
 ```python
 # -*- coding: utf-8 -*-
@@ -143,90 +145,90 @@ from utils.com import qprint, chat
 from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers, load_all_tools_from_local_toolboxes
 from globals import globals
 
-# 防止输出乱码
+# Prevent output encoding issues
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
 
-# 加载模型配置
+# Load model configuration
 agent_model_config = load_model_config("MyCustomAgent_agent_model_config")
 
-# 定义 Agent 的系统提示词
-system_prompt = """你是一个智能助手，具备以下能力：
-- [在这里描述你的 Agent 的能力和职责]
-- [具体的工作流程和目标]
+# Define Agent system prompt
+system_prompt = """You are an intelligent assistant with the following capabilities:
+- [Describe your Agent's abilities and responsibilities here]
+- [Specific workflow and objectives]
 """
 
 async def main():
     try:
-        # Agent 开场白
-        qprint("👋 欢迎使用我的智能 Agent ")
+        # Agent welcome message
+        qprint("👋 Welcome to use my intelligent Agent ")
         
-        # 初始化项目资源
+        # Initialize project resources
         globals.PROJECT_NAME = "MyCustomAgent"
         globals.PROJECT_PATH = os.path.abspath(f"./projects/{globals.PROJECT_NAME}")
         os.makedirs(globals.PROJECT_PATH, exist_ok=True)
         
-        # 声明本地自定义工具包（可配置多个）
+        # Declare local custom tool packages (configurable)
         local_tool_boxes = [
-            "MyCustomTools",     # 你的自定义工具包
-            # "OtherTools",      # 可以添加更多工具包
+            "MyCustomTools",     # Your custom tool package
+            # "OtherTools",      # Can add more tool packages
         ]
         local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_tool_boxes)
         
-        # 加载 MCP 服务器工具（可选）
-        # 支持以下几种配置方式，取消注释使用：
+        # Load MCP server tools (optional)
+        # Support the following configuration methods, uncomment to use:
         mcp_servers = [
-            # 1️⃣ NPX 包方式 - 文件系统控制
+            # 1️⃣ NPX package method - File system control
             # MCPToolSession("npx", ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]),
             
-            # 2️⃣ UVX 包方式 - 标记文本格式互转（需要 uv 工具）
+            # 2️⃣ UVX package method - Markup text format conversion (requires uv tool)
             # MCPToolSession("uvx", ["--index-url", "https://pypi.tuna.tsinghua.edu.cn/simple", "mcp-pandoc"]),
             
-            # 3️⃣ 本地包方式 - 火车票查询等自定义服务
+            # 3️⃣ Local package method - Custom services like train ticket queries
             # MCPToolSession("npx", ["-y", "./local_servers/12306-mcp"]),
             
-            # 4️⃣ SSE 链接方式 - 远端 MCP 服务（如百度优选 MCP）
+            # 4️⃣ SSE link method - Remote MCP services (e.g., Baidu selected MCP)
             # MCPToolSession(sse_url="https://mcp-youxuan.baidu.com/mcp/sse?key=<your-api-key>"),
         ]
         mcp_tools, mcp_registry, mcp_sessions = await load_all_tools_from_MCP_servers(mcp_servers)
         
-        # 合并所有工具
+        # Merge all tools
         tools = local_tools + mcp_tools
         tools_registry = local_tools_registry | mcp_registry
         
-        # 列举已有的工具
+        # List loaded tools
         tools_names = "\n".join(tools_registry.keys())
-        qprint(f"✅ 已加载工具：\n{tools_names}")
+        qprint(f"✅ Loaded tools:\n{tools_names}")
         
-        qprint("🚀 Agent 已就绪！")
+        qprint("🚀 Agent is ready!")
         
-        # 启动对话循环
+        # Start conversation loop
         try:
             await chat(agent_model_config, system_prompt, tools, tools_registry)
         finally:
-            # 关闭 MCP 会话
+            # Close MCP sessions
             for mcp in mcp_sessions:
                 await mcp.close()
-            qprint("👋 会话已结束")
+            qprint("👋 Session ended")
     
     except Exception as e:
-        qprint(f"❌ 启动失败: {e}")
+        qprint(f"❌ Startup failed: {e}")
         raise
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-**关键点说明：**
+**Key Points:**
 
-✅ **配置加载** - 使用 `load_model_config()` 加载 YAML 配置  
-✅ **异步架构** - 采用 `async/await` 支持非阻塞操作  
-✅ **工具集成** - 支持本地工具和 MCP 远端工具  
-✅ **统一对话** - 通过 `chat()` 函数处理所有对话和工具调用  
-✅ **资源管理** - 自动创建项目资源目录并管理生命周期
+✅ **Config Loading** - Use `load_model_config()` to load YAML configuration  
+✅ **Async Architecture** - Use `async/await` for non-blocking operations  
+✅ **Tool Integration** - Support local tools and remote MCP tools  
+✅ **Unified Chat** - Use `chat()` function to handle all conversations and tool calls  
+✅ **Resource Management** - Automatically create project directories and manage lifecycle
 
-### 第二步：创建工具包
+### Step 2: Create Tool Package
 
-在 `./backend/tools/` 下创建你的工具包文件：
+Create your tool package file in `./backend/tools/`:
 
 ```python
 # backend/tools/MyCustomTools.py
@@ -234,74 +236,74 @@ import json
 from utils.config import load_model_config
 from utils.com import request_LLM_api
 
-# ==================== 工具实现 ====================
+# ==================== Tool Implementation ====================
 
 def search_web(query: str) -> str:
     """
-    在网络上搜索信息
+    Search information on the web
     Args:
-        query: 搜索关键词
+        query: Search keywords
     Returns:
-        搜索结果字符串
+        Search results
     """
-    # 实现你的搜索逻辑
-    return f"搜索结果：{query}"
+    # Implement your search logic
+    return f"Search results: {query}"
 
 def analyze_data(data: str) -> str:
     """
-    分析数据
+    Analyze data
     Args:
-        data: 待分析数据
+        data: Data to analyze
     Returns:
-        分析结果
+        Analysis results
     """
-    # 实现你的数据分析逻辑
-    return f"分析完成：{data}"
+    # Implement your data analysis logic
+    return f"Analysis complete: {data}"
 
 def generate_summary(content: str) -> str:
     """
-    使用 LLM 生成内容摘要
+    Use LLM to generate content summary
     Args:
-        content: 待摘要的内容
+        content: Content to summarize
     Returns:
-        生成的摘要
+        Generated summary
     """
-    # 在工具内部调用 LLM API 的示例
+    # Example of calling LLM API inside tool
     
-    # 1️⃣ 加载模型配置
+    # 1️⃣ Load model configuration
     model_config = load_model_config("MyCustomAgent_agent_model_config")
     
-    # 2️⃣ 定义提示词
-    system_prompt = "你是一个专业的文本摘要助手，能够快速提炼内容要点。"
-    user_prompt = f"请为以下内容生成一个简洁的摘要：\n{content}"
+    # 2️⃣ Define prompts
+    system_prompt = "You are a professional text summarization assistant."
+    user_prompt = f"Please generate a concise summary for the following content:\n{content}"
     
-    # 3️⃣ 调用 LLM API
+    # 3️⃣ Call LLM API
     summary = request_LLM_api(model_config, user_prompt, system_prompt)
     
     return summary
 
-# ==================== 工具注册 ====================
+# ==================== Tool Registration ====================
 
-# 工具函数映射表（LLM 调用工具时根据名称查找函数）
+# Tool function mapping table (LLM finds functions by name)
 tool_registry = {
     "search_web": search_web,
     "analyze_data": analyze_data,
     "generate_summary": generate_summary,
 }
 
-# 工具定义数组（符合 OpenAI Function Calling 格式）
+# Tool definition array (conform to OpenAI Function Calling format)
 tools = [
     {
         "type": "function",
         "function": {
             "name": "search_web",
-            "description": "在网络上搜索相关信息",
+            "description": "Search for relevant information on the web",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "搜索关键词"
+                        "description": "Search keywords"
                     }
                 },
                 "required": ["query"]
@@ -312,13 +314,13 @@ tools = [
         "type": "function",
         "function": {
             "name": "analyze_data",
-            "description": "对数据进行分析和处理",
+            "description": "Analyze and process data",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "data": {
                         "type": "string",
-                        "description": "待分析的数据"
+                        "description": "Data to analyze"
                     }
                 },
                 "required": ["data"]
@@ -329,13 +331,13 @@ tools = [
         "type": "function",
         "function": {
             "name": "generate_summary",
-            "description": "使用 AI 生成内容摘要",
+            "description": "Use AI to generate content summary",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "content": {
                         "type": "string",
-                        "description": "待摘要的内容"
+                        "description": "Content to summarize"
                     }
                 },
                 "required": ["content"]
@@ -345,99 +347,99 @@ tools = [
 ]
 ```
 
-**工具包的核心要素：**
+**Core Elements of Tool Package:**
 
-✅ **工具函数** - 实现具体的业务逻辑的 Python 函数  
-✅ **工具注册表** - `tool_registry` 字典，将工具名称映射到函数对象  
-✅ **工具定义** - `tools` 列表，遵循 OpenAI Function Calling 规范  
-✅ **参数描述** - 清晰的参数名称和说明，帮助 LLM 正确调用  
+✅ **Tool Functions** - Python functions implementing business logic  
+✅ **Tool Registry** - `tool_registry` dictionary mapping tool names to functions  
+✅ **Tool Definitions** - `tools` list conforming to OpenAI Function Calling specification  
+✅ **Parameter Descriptions** - Clear parameter names and descriptions for LLM  
 
-**💡 工具内部调用 LLM API：**
+**💡 Calling LLM API Inside Tools:**
 
-当工具需要 LLM 的支持时（如数据分析、文本生成等），可使用 `request_LLM_api()` 函数：
+When tools need LLM support (e.g., data analysis, text generation), use `request_LLM_api()`:
 
 ```python
 from utils.config import load_model_config
 from utils.com import request_LLM_api
 
-# 加载模型配置
+# Load model configuration
 model_config = load_model_config("Config_Name")
 
-# 调用 LLM API - 三个必需参数
+# Call LLM API - three required parameters
 response = request_LLM_api(
-    model_config,      # ✅ 模型配置对象
-    user_prompt,       # ✅ 用户提示词
-    system_prompt      # ✅ 系统提示词
+    model_config,      # ✅ Model configuration object
+    user_prompt,       # ✅ User prompt
+    system_prompt      # ✅ System prompt
 )
 ```
 
-在 Agent 主文件中动态加载工具：
+Dynamically load tools in Agent main file:
 
 ```python
 from utils.mcp import load_all_tools_from_local_toolboxes
 
-# 声明要加载的工具包名称
+# Declare tool package names to load
 local_tool_boxes = [
-    "MyCustomTools",     # 你的工具包名称
-    # "OtherTools",      # 支持加载多个工具包
+    "MyCustomTools",     # Your tool package name
+    # "OtherTools",      # Support loading multiple tool packages
 ]
 
-# 动态加载所有工具
+# Dynamically load all tools
 local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_tool_boxes)
 ```
 
-### 第三步：配置 Agent 信息
+### Step 3: Configure Agent Info
 
-编辑 `./configs/agents.json`，添加你的 Agent 配置：
+Edit `./configs/agents.json` to add your Agent configuration:
 
 ```json
 {
     "name": "MyCustomAgent",
-    "type": "文本处理",
-    "nick_name": "我的智能体",
-    "description": "这是我定制的超强智能体，能够...",
+    "type": "Text Processing",
+    "nick_name": "My Intelligent Agent",
+    "description": "This is my custom powerful agent that can...",
     "avatar": "./assets/avatar/MyCustomAgent.jpg",
     "model": "gpt-4",
     "tools": ["search_information", "analyze_data"]
 }
 ```
 
-### 第四步：配置模型和 API
+### Step 4: Configure Models and API
 
-在 `./configs/models.yaml` 中为你的 Agent 配置所需的模型：
+Configure required models for your Agent in `./configs/models.yaml`:
 
 ```yaml
-# MyCustomAgent 主要任务配置
+# MyCustomAgent main task configuration
 MyCustomAgent_agent_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "sk-xxxxxxxxxxxxx"
 
-# MyCustomAgent 复杂任务配置（可选）
+# MyCustomAgent complex task configuration (optional)
 MyCustomAgent_reasoning_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
-在你的 Agent 代码中使用 `load_model_config()` 函数加载配置：
+Use `load_model_config()` function to load configuration in your Agent code:
 
 ```python
 from utils.config import load_model_config
 
-# 加载主要任务的模型配置
+# Load main task model configuration
 agent_config = load_model_config("MyCustomAgent_agent_model_config")
 
-# 加载复杂推理任务的模型配置（可选）
+# Load complex reasoning task model configuration (optional)
 reasoning_config = load_model_config("MyCustomAgent_reasoning_model_config")
 
-# 配置会自动被传递给 chat() 函数使用
+# Configuration will be automatically passed to chat() function
 await chat(agent_config, system_prompt, tools, tools_registry)
 ```
 
-### 第五步（可选）：创建自定义 GUI 页面
+### Step 5 (Optional): Create Custom GUI Page
 
-在 `./pages/agents/` 下创建专属的 GUI 页面：
+Create dedicated GUI page in `./pages/agents/`:
 
 ```python
 # pages/agents/MyCustomAgent.py
@@ -454,9 +456,9 @@ class MyCustomAgentPage(QWidget):
         layout = QVBoxLayout()
         
         self.input_field = QLineEdit()
-        self.input_field.setPlaceholderText("输入你的需求...")
+        self.input_field.setPlaceholderText("Enter your request...")
         
-        self.run_button = QPushButton("执行")
+        self.run_button = QPushButton("Execute")
         self.run_button.clicked.connect(self.run_agent)
         
         self.output_field = QTextEdit()
@@ -476,125 +478,125 @@ class MyCustomAgentPage(QWidget):
 
 ---
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 OpenLOA/
-├── app_GUI.py                 # GUI 应用入口
-├── app_TUI.py                 # TUI 应用入口
-├── requirements.txt           # Python 依赖
-├── README.md                  # 项目文档
+├── app_GUI.py                 # GUI application entry point
+├── app_TUI.py                 # TUI application entry point
+├── requirements.txt           # Python dependencies
+├── README.md                  # Project documentation
 │
-├── assets/                    # 资源文件
-│   ├── avatar/               # Agent 头像
-│   └── home/                 # 首页资源
+├── assets/                    # Resource files
+│   ├── avatar/               # Agent avatars
+│   └── home/                 # Home page resources
 │
-├── backend/                   # Agent 核心逻辑
+├── backend/                   # Agent core logic
 │   ├── Sara.py               # Sara Agent
 │   ├── Zed.py                # Zed Agent
-│   ├── tools/                # 工具包
+│   ├── tools/                # Tool packages
 │   │   ├── Sara_tools.py
 │   │   ├── Zed_tools.py
 │   │   └── __pycache__/
-│   ├── utils/                # 工具函数
-│   │   ├── config.py         # 配置管理
-│   │   ├── mcp.py            # MCP 协议支持
-│   │   └── com.py            # 通信工具
-│   └── chroma_db/            # 向量数据库
+│   ├── utils/                # Utility functions
+│   │   ├── config.py         # Configuration management
+│   │   ├── mcp.py            # MCP protocol support
+│   │   └── com.py            # Communication tools
+│   └── chroma_db/            # Vector database
 │
-├── pages/                     # GUI 页面
-│   ├── MainWindow.py         # 主窗口
-│   ├── WelcomePage.py        # 欢迎页
-│   ├── ChooseAgentPage.py    # Agent 选择页
-│   └── agents/               # Agent 专用页面
+├── pages/                     # GUI pages
+│   ├── MainWindow.py         # Main window
+│   ├── WelcomePage.py        # Welcome page
+│   ├── ChooseAgentPage.py    # Agent selection page
+│   └── agents/               # Agent-specific pages
 │       ├── Sara.py
 │       └── Zed.py
 │
-└── configs/                   # 配置文件
-    ├── agents.json           # Agent 配置
-    ├── models.yaml           # 模型配置
-    └── settings.yaml         # 应用配置
+└── configs/                   # Configuration files
+    ├── agents.json           # Agent configuration
+    ├── models.yaml           # Model configuration
+    └── settings.yaml         # Application configuration
 ```
 
 ---
 
-## 📦 现有 Agent 展示
+## 📦 Existing Agents
 
-OpenLOA 提供了多个开箱即用的 Agent：
+OpenLOA provides several ready-to-use Agents:
 
-| Agent | 功能 | 描述 |
-|-------|------|------|
-| 🎭 **Zed** | 文本处理 | 替你写汇报（仿造你以前的文字风格） |
-| 💼 **Sara** | 求职招聘 | 自动投简历（自动根据简历内容投递） |
-| 🧠 **Riven** | 资源抓取 | 图神经网络专家 |
-| 💨 **Yasuo** | 图片生成 | 强化学习玩家 |
-| 🌸 **Catherine** | 图片处理 | 多模态处理专家 |
-| 🥷 **Akali** | 数据分析 | 隐秘的数据分析师 |
-| 🧪 **Singed** | 实验生成 | 疯狂的科学家 |
-| 💣 **Jinx** | 视频生成 | 视频生成演员 |
+| Agent | Function | Description |
+|-------|----------|-------------|
+| 🎭 **Zed** | Text Processing | Write reports for you (mimicking your writing style) |
+| 💼 **Sara** | Job Recruitment | Auto-submit resumes (automatically apply based on resume content) |
+| 🧠 **Riven** | Resource Scraping | Graph neural network expert |
+| 💨 **Yasuo** | Image Generation | Reinforcement learning player |
+| 🌸 **Catherine** | Image Processing | Multimodal processing expert |
+| 🥷 **Akali** | Data Analysis | Secret data analyst |
+| 🧪 **Singed** | Experiment Generation | Mad scientist |
+| 💣 **Jinx** | Video Generation | Video generation actor |
 
 ---
 
-## 🔧 开发指南
+## 🔧 Development Guide
 
-### 环境要求
+### Requirements
 
 - Python 3.8+
-- pip 或其他包管理工具
-- 有效的 LLM API Key（OpenAI、Anthropic 等）
+- pip or other package manager
+- Valid LLM API Key (OpenAI, Anthropic, etc.)
 
-### 推荐的开发流程
+### Recommended Development Workflow
 
-1. **创建新分支** 用于开发你的 Agent
+1. **Create a new branch** for developing your Agent
    ```bash
    git checkout -b feature/my-agent
    ```
 
-2. **开发并测试**
+2. **Develop and test**
    ```bash
-   # 在本地测试你的 Agent
+   # Test your Agent locally
    python backend/MyAgent.py
    ```
 
-3. **提交代码**
+3. **Commit code**
    ```bash
    git commit -m "feat: Add MyAgent"
    git push origin feature/my-agent
    ```
 
-4. **提交 Pull Request**
-   详细描述你的 Agent 功能、使用方式等
+4. **Submit Pull Request**
+   Describe your Agent's functionality and usage
 
 ---
 
-## 🌟 高级功能
+## 🌟 Advanced Features
 
-### 💾 向量数据库集成 - 实现 RAG 架构
+### 💾 Vector Database Integration - Implementing RAG Architecture
 
-**什么是 RAG (Retrieval-Augmented Generation)？**
+**What is RAG (Retrieval-Augmented Generation)?**
 
-RAG 是一种先进的 AI 技术，结合了检索（Retrieval）和生成（Generation）两个阶段：
-1. **检索阶段** - 从向量数据库中检索与用户问题相关的信息
-2. **生成阶段** - 基于检索到的上下文，LLM 生成更准确、更具体的回答
+RAG is an advanced AI technique combining retrieval and generation stages:
+1. **Retrieval Stage** - Retrieve information related to user questions from vector database
+2. **Generation Stage** - Based on retrieved context, LLM generates more accurate answers
 
-通过 ChromaDB 为你的 Agent 实现 RAG 架构，可以：
-- 🧠 为 Agent 添加长期记忆和专业知识库
-- 🎯 基于历史数据做出更准确的决策
-- 📚 支持持续学习，Agent 的能力随时间积累而增强
+Implementing RAG architecture for your Agent with ChromaDB enables:
+- 🧠 Add long-term memory and knowledge base for Agents
+- 🎯 Make more accurate decisions based on historical data
+- 📚 Support continuous learning, Agent capabilities accumulate over time
 
-#### 第一步：配置 Embedding 模型
+#### Step 1: Configure Embedding Model
 
-在 `./configs/models.yaml` 中添加向量化模型配置：
+Add embedding model configuration in `./configs/models.yaml`:
 
 ```yaml
-# MyCustomAgent 向量化模型配置（用于 RAG 检索）
+# MyCustomAgent embedding model configuration (for RAG retrieval)
 MyCustomAgent_embedding_model_config:
   base_url: "https://api.deepseek.com"
-  model: "text-embedding-3-small"      # 将文本转换为向量
+  model: "text-embedding-3-small"      # Convert text to vectors
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
-#### 第二步：在工具或 Agent 中实现 RAG
+#### Step 2: Implement RAG in Tools or Agent
 
 ```python
 import chromadb
@@ -603,197 +605,197 @@ from openai import OpenAI
 from utils.config import load_model_config
 from ulid import ULID
 
-# 1️⃣ 加载向量化模型配置（从 YAML 读取）
+# 1️⃣ Load embedding model configuration (from YAML)
 embedding_model_config = load_model_config("MyCustomAgent_embedding_model_config")
 
-# 2️⃣ 初始化 OpenAI 客户端（使用配置中的参数）
+# 2️⃣ Initialize OpenAI client (using configuration parameters)
 oa_client = OpenAI(
     api_key=embedding_model_config.get("api_key"),
     base_url=embedding_model_config.get("base_url")
 )
 
-# 3️⃣ 初始化持久化向量数据库客户端
+# 3️⃣ Initialize persistent vector database client
 client = chromadb.PersistentClient(
-    path="./chroma_db",                 # 数据存储位置
+    path="./chroma_db",                 # Data storage location
     settings=Settings()
 )
 
-# 4️⃣ 获取或创建集合（Collection）
+# 4️⃣ Get or create collection
 collection = client.get_or_create_collection(name="agent_memory")
 
-# 5️⃣ 生成文本向量
+# 5️⃣ Generate text vectors
 def embed_text(text: str) -> list:
-    """将文本转换为向量"""
+    """Convert text to vectors"""
     response = oa_client.embeddings.create(
-        model=embedding_model_config.get("model"),  # 使用配置中的模型
+        model=embedding_model_config.get("model"),  # Use model from configuration
         input=text
     )
     return response.data[0].embedding
 
-# 6️⃣ 存储内容到向量数据库
+# 6️⃣ Store content to vector database
 embedding = embed_text("User experience and feedback")
 collection.add(
-    ids=[str(ULID())],                  # 生成唯一 ID
+    ids=[str(ULID())],                  # Generate unique ID
     embeddings=[embedding],
     documents=["User experience and feedback"],
     metadatas=[{"type": "feedback", "date": "2024-03-12"}]
 )
 
-# 7️⃣ 向量搜索 - 检索相似信息
+# 7️⃣ Vector search - Retrieve similar information
 query_embedding = embed_text("What did users say?")
 results = collection.query(
     query_embeddings=[query_embedding],
-    n_results=3,                        # 返回最相似的 3 条
+    n_results=3,                        # Return top 3 similar items
     include=["documents", "metadatas", "distances"]
 )
 
-# 8️⃣ 处理搜索结果
+# 8️⃣ Process search results
 for doc, metadata, distance in zip(
     results["documents"][0],
     results["metadatas"][0],
     results["distances"][0]
 ):
-    print(f"📄 文档: {doc}")
-    print(f"📊 相似度: {1 - distance:.4f}")  # 距离越小，相似度越高
+    print(f"📄 Document: {doc}")
+    print(f"📊 Similarity: {1 - distance:.4f}")  # Smaller distance = higher similarity
 ```
 
-**RAG 工作流程：**
+**RAG Workflow:**
 
 ```
-【RAG 流程】
-用户问题 → 向量化 → 向量检索 → 相似文档 → LLM 上下文生成 → 精准回答
-         (Embedding)  (Retrieval) (Top-K)    (Augmented Generation)
+【RAG Process】
+User Question → Vectorization → Vector Retrieval → Similar Documents → LLM Context Generation → Accurate Answer
+         (Embedding)  (Retrieval)  (Top-K)          (Augmented Generation)
 ```
 
-**关键点提示：**
+**Key Points:**
 
-✅ **使用配置加载** - 通过 `load_model_config()` 读取 YAML 配置，便于修改  
-✅ **不硬编码密钥** - API Key 和 Base URL 都从配置中读取  
-✅ **唯一 ID 生成** - 使用 ULID 库生成全局唯一的记录 ID  
-✅ **元数据管理** - 为每条记录附加类型、日期等信息，便于后续查询  
-✅ **相似度排序** - 返回的结果按相似度排序，距离越小相似度越高  
+✅ **Use Config Loading** - Read YAML configuration via `load_model_config()`  
+✅ **No Hardcoded Keys** - API Keys and Base URLs loaded from configuration  
+✅ **Unique ID Generation** - Use ULID library to generate globally unique IDs  
+✅ **Metadata Management** - Attach type, date and other info to records  
+✅ **Similarity Ranking** - Results ranked by similarity, smaller distance = higher similarity  
 
-**RAG 架构的优势：**
+**RAG Architecture Advantages:**
 
-✅ **知识增强** - LLM 基于实际数据生成答案，减少幻觉（Hallucination）  
-✅ **上下文感知** - 检索相关信息作为上下文，提升答案准确性和相关性  
-✅ **持续学习** - 新数据持续录入向量库，Agent 能力不断提升  
-✅ **可追溯性** - 用户可查看 Agent 的回答基于哪些资料  
+✅ **Knowledge Enhancement** - LLM generates answers based on real data, reducing hallucinations  
+✅ **Context Awareness** - Retrieved information as context improves accuracy and relevance  
+✅ **Continuous Learning** - New data continuously recorded enables Agent capability accumulation  
+✅ **Traceability** - Users can see which resources Agent answers are based on  
 
-**ChromaDB 的核心优势：**
+**ChromaDB Core Advantages:**
 
-✅ **持久化存储** - 数据保存在本地文件系统，支持长期积累  
-✅ **向量检索** - 快速找到相似内容，用于 RAG 的检索阶段  
-✅ **元数据管理** - 为每条记录附加类型、日期等信息  
-✅ **灵活查询** - 支持向量相似性搜索，而非精确匹配  
+✅ **Persistent Storage** - Data saved in local file system, supports long-term accumulation  
+✅ **Vector Retrieval** - Fast retrieval of similar content for RAG retrieval stage  
+✅ **Metadata Management** - Attach type, date and other info to records  
+✅ **Flexible Queries** - Support vector similarity search, not just exact matching  
 
 ---
 
-### 🌐 MCP 协议支持
+### 🌐 MCP Protocol Support
 
-通过 Model Context Protocol 实现与其他系统的无缝集成。在 Agent 主文件中配置 MCP 服务器：
+Implement seamless integration with other systems via Model Context Protocol. Configure MCP servers in your Agent main file:
 
 ```python
 from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers
 import asyncio
 
 async def main():
-    # 配置支持 4 种不同的 MCP 服务器连接方式
+    # Configure 4 different MCP server connection methods
     mcp_servers = [
-        # 1️⃣ NPX 包方式 - 访问本地文件系统
+        # 1️⃣ NPX package method - Access local file system
         MCPToolSession("npx", [
             "-y", 
             "@modelcontextprotocol/server-filesystem", 
             "./workspace"
         ]),
         
-        # 2️⃣ UVX 包方式 - 使用 PyPI 上的 MCP 工具（需要安装 uv）
+        # 2️⃣ UVX package method - Use MCP tools from PyPI (requires uv tool)
         MCPToolSession("uvx", [
             "--index-url",
             "https://pypi.tuna.tsinghua.edu.cn/simple",
-            "mcp-pandoc"                    # 标记文本格式互转工具
+            "mcp-pandoc"                    # Markup text format conversion tool
         ]),
         
-        # 3️⃣ 本地包方式 - 使用本地开发的 MCP 服务
+        # 3️⃣ Local package method - Use locally developed MCP services
         MCPToolSession("npx", [
             "-y",
-            "./local_servers/train-ticket-mcp"  # 本地火车票查询服务
+            "./local_servers/train-ticket-mcp"  # Local train ticket query service
         ]),
         
-        # 4️⃣ SSE 链接方式 - 连接远端 MCP 服务（如云端 MCP）
+        # 4️⃣ SSE link method - Connect to remote MCP services (e.g., cloud MCP)
         MCPToolSession(sse_url="https://mcp-baidu.example.com/sse?key=your-api-key"),
     ]
     
-    # 加载所有 MCP 工具
+    # Load all MCP tools
     mcp_tools, mcp_registry, mcp_sessions = await load_all_tools_from_MCP_servers(mcp_servers)
     
-    # 合并工具
+    # Merge tools
     tools = local_tools + mcp_tools
     tools_registry = local_tools_registry | mcp_registry
     
-    # 启动 Agent 对话时就拥有 MCP 工具的能力了
+    # Agent conversation now has MCP tool capabilities
     await chat(agent_model_config, system_prompt, tools, tools_registry)
     
-    # 对话结束后关闭 MCP 会话
+    # Close MCP sessions after conversation
     for mcp in mcp_sessions:
         await mcp.close()
 ```
 
-**MCP 集成的应用场景：**
+**MCP Integration Use Cases:**
 
-| 方式 | 用途 | 示例 |
-|------|------|------|
-| **NPX 包** | 系统级工具 | 文件系统访问、命令执行 |
-| **UVX 包** | Python 工具库 | 文本处理、数据转换 |
-| **本地服务** | 自定义服务 | 业务逻辑、数据查询 |
-| **SSE 链接** | 云端服务 | 三方 API、外部数据源 |
-
----
-
-## 📝 许可证
-
-本项目采用 **MIT 许可证**。详见 [LICENSE](LICENSE) 文件。
+| Method | Purpose | Example |
+|--------|---------|---------|
+| **NPX Package** | System-level tools | File system access, command execution |
+| **UVX Package** | Python tool libraries | Text processing, data transformation |
+| **Local Services** | Custom services | Business logic, data queries |
+| **SSE Links** | Cloud services | Third-party APIs, external data sources |
 
 ---
 
-## 🤝 贡献指南
+## 📝 License
 
-我们欢迎所有形式的贡献！包括但不限于：
-
-- 🐛 报告 Bug
-- ✨ 提议新功能
-- 📝 改进文档
-- 🎨 创建新的 Agent
-- 🔧 优化代码
-
-### 贡献步骤
-
-1. Fork 本项目
-2. 创建你的特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启一个 Pull Request
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📞 联系方式
+## 🤝 Contributing Guide
+
+We welcome all forms of contributions! Including but not limited to:
+
+- 🐛 Report bugs
+- ✨ Propose new features
+- 📝 Improve documentation
+- 🎨 Create new Agents
+- 🔧 Optimize code
+
+### Contribution Steps
+
+1. Fork this project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📞 Contact
 
 - 📧 Email: fdshiwoa@gmail.com
-- 💬 微信: fdshiwoa
-- 💬 GitHub Discussions: [在此提问](https://github.com/DeanFan1994/OpenLOA/discussions)
-- 🐛 Issue Tracker: [报告问题](https://github.com/DeanFan1994/OpenLOA/issues)
+- 💬 WeChat: fdshiwoa
+- 💬 GitHub Discussions: [Ask Here](https://github.com/DeanFan1994/OpenLOA/discussions)
+- 🐛 Issue Tracker: [Report Issues](https://github.com/DeanFan1994/OpenLOA/issues)
 
 ---
 
-## 🙏 致谢
+## 🙏 Acknowledgments
 
-感谢所有为 OpenLOA 做出贡献的开发者和用户！
+Thanks to all developers and users who have contributed to OpenLOA!
 
 ---
 
 <div align="center">
 
-**⭐ 如果这个项目对你有帮助，请给个 Star！**
+**⭐ If this project helps you, please give it a Star!**
 
 Made with ❤️ by the OpenLOA Team
 
