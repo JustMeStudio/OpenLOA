@@ -1,0 +1,89 @@
+# 任务配置列表
+Zed:
+  avatar: "./assets/avatar/Zed.jpg"
+  zh:
+    type: "文本任务"
+    nick_name: "影分身-劫"
+    description: "替你写汇报（会仿造你以前的文字风格的那种）"
+  en:
+    type: "Text Task"
+    nick_name: "Shadow Dash - Zed"
+    description: "Write reports for you (mimics your writing style)"
+
+Sara:
+  avatar: "./assets/avatar/Sara.jpg"
+  zh:
+    type: "浏览器任务"
+    nick_name: "职位猎人-沙拉"
+    description: "自动投简历（自动根据你的简历内容投，各大平台投）"
+  en:
+    type: "Browser Task"
+    nick_name: "Job Hunter - Sara"
+    description: "Auto-apply for jobs (automatically applies on major platforms based on your resume)"
+
+Riven:
+  avatar: "./assets/avatar/Riven.jpg"
+  zh:
+    type: "图像任务"
+    nick_name: "瑞雯"
+    description: "示例展示"
+  en:
+    type: "Image Task"
+    nick_name: "Riven"
+    description: "Example Show"
+
+Yasuo:
+  avatar: "./assets/avatar/Yasuo.jpg"
+  zh:
+    type: "视频任务"
+    nick_name: "亚索"
+    description: "示例展示"
+  en:
+    type: "Video Task"
+    nick_name: "Yasuo"
+    description: "Example Show"
+
+Catherine:
+  avatar: "./assets/avatar/Catherine.jpg"
+  zh:
+    type: "音频任务"
+    nick_name: "凯特琳"
+    description: "示例展示"
+  en:
+    type: "Audio Task"
+    nick_name: "Catherine"
+    description: "Example Show"
+
+# 以下为 Demo 补充
+Akali:
+  avatar: "./assets/avatar/Akali.jpg"
+  zh:
+    type: "文本任务"
+    nick_name: "阿卡丽"
+    description: "仅供展示"
+  en:
+    type: "Text Task"
+    nick_name: "Akali"
+    description: "Just Demo"
+
+Singed:
+  avatar: "./assets/avatar/Singed.jpg"
+  zh:
+    type: "图像任务"
+    nick_name: "辛吉德"
+    description: "仅供展示"
+  en:
+    type: "Image Task"
+    nick_name: "Singed"
+    description: "Just Demo"
+
+Jinx:
+  avatar: "./assets/avatar/Jinx.jpg"
+  zh:
+    type: "音频任务"
+    nick_name: "金克丝"
+    description: "仅供展示"
+  en:
+    type: "Audio Task"
+    nick_name: "Jinx"
+    description: "Just Demo"

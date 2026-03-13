@@ -1,13 +1,13 @@
-import sys
 import webbrowser
 from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout,
     QListWidget, QListWidgetItem, QStackedWidget,
-    QScrollArea, QListView, QFrame, QPushButton
+    QScrollArea, QFrame, QPushButton
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont, QPixmap, QCursor
 from pages.i18n import get_current_language, get_text
+from pages.utils.config import load_agent_profiles
 
 
 class ClickableWidget(QWidget):
@@ -116,23 +116,43 @@ class ChooseAgentPage(QWidget):
         self.stack = QStackedWidget()
         content_layout.addWidget(self.stack)
         
-        self.populate_tabs(agents)
+        self.populate_tabs(self.agents)
         
         # 信号连接
         self.menu_list.currentRowChanged.connect(self.stack.setCurrentIndex)
         self.menu_list.setCurrentRow(0)
 
-    def populate_tabs(self, agents):
+    def populate_tabs(self, agents_dict):
+        # 清除旧的UI元素
+        self.menu_list.clear()
+        while self.stack.count() > 0:
+            widget = self.stack.widget(0)
+            self.stack.removeWidget(widget)
+            if widget:
+                widget.deleteLater()
+        
+        # 1. 预处理：将 YAML 字典转回内部使用的 agent 列表格式
+        processed_agents = []
+        for name, data in agents_dict.items():
+            # 合并通用字段和语言特定字段
+            lang_config = data.get(self.language, {})
+            agent_item = {
+                "name": name,  # 用于获取页面类名
+                "avatar": data.get("avatar", ""),
+                "type": lang_config.get("type", "Unknown"),
+                "nick_name": lang_config.get("nick_name", name),
+                "description": lang_config.get("description", "")
+            }
+            processed_agents.append(agent_item)
+        # 2. 按类型分组 (逻辑保持不变，但使用 processed_agents)
         type_to_agents = {}
-        for ag in agents:
+        for ag in processed_agents:
             type_to_agents.setdefault(ag["type"], []).append(ag)
-
         # Predefined color rotation
         bg_colors = ["#FFFACD", "#E0FFFF", "#F0E68C", "#E6E6FA", "#FFE4E1"]
-
+        # 3. 渲染 UI
         for type_name, agent_list in type_to_agents.items():
             self.menu_list.addItem(QListWidgetItem(type_name))
-
             page = QWidget()
             page_layout = QVBoxLayout(page)
             scroll_area = QScrollArea(widgetResizable=True)
@@ -143,48 +163,37 @@ class ChooseAgentPage(QWidget):
             scroll_layout.addStretch()
             scroll_area.setWidget(scroll_content)
             page_layout.addWidget(scroll_area)
-
             for idx, ag in enumerate(agent_list):
                 color = bg_colors[idx % len(bg_colors)]
                 frame = QFrame()
-                frame.setFrameShape(QFrame.Box)
-                frame.setFrameShadow(QFrame.Raised)
-                frame.setLineWidth(2)
-                frame.setStyleSheet(f"""
-                    QFrame {{
-                        border: 2px solid #0078D7;
-                        border-radius: 6px;
-                        background-color: {color};
-                    }}
-                """)
-
+                # ... (样式设置保持不变)
+                frame.setStyleSheet(f"QFrame {{ border: 2px solid #0078D7; border-radius: 6px; background-color: {color}; }}")
                 w = ClickableWidget()
+                # 这里传递的 ag 已经是包含正确语言信息的 dict 了
                 w.clicked.connect(lambda a=ag: self.on_agent_selected(a))
                 inner = QVBoxLayout(w)
                 top_layout = QHBoxLayout()
                 pix = QLabel()
                 pix.setPixmap(QPixmap(ag['avatar']).scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
                 top_layout.addWidget(pix, alignment=Qt.AlignLeft | Qt.AlignVCenter)
-
-                name = QLabel(ag["nick_name"])
-                name.setFont(QFont("", 11, QFont.Bold))
+                name_label = QLabel(ag["nick_name"])
+                name_label.setFont(QFont("", 11, QFont.Bold))
                 desc = QLabel(ag['description'])
                 desc.setWordWrap(True)
                 name_layout = QVBoxLayout()
-                name_layout.addWidget(name)
+                name_layout.addWidget(name_label)
                 name_layout.addWidget(desc)
                 top_layout.addLayout(name_layout)
                 inner.addLayout(top_layout)
-
                 frame.setLayout(QVBoxLayout())
                 frame.layout().addWidget(w)
                 if len(agent_list) == 1:
                     grid.addWidget(frame, 0, 0, alignment=Qt.AlignLeft)
                 else:
                     grid.addWidget(frame, idx // 2, idx % 2)
-
             self.stack.addWidget(page)
 
+        # 重新连接信号
         self.menu_list.currentRowChanged.connect(self.stack.setCurrentIndex)
         self.menu_list.setCurrentRow(0)
 
@@ -196,3 +205,7 @@ class ChooseAgentPage(QWidget):
         self.username_label.setText(get_text('welcome_message', new_language))
         self.status_label.setText(get_text('system_status', new_language))
         self.star_button.setText(get_text('star_button', new_language))
+
+        #更新语言后重新加载智能体配置并刷新页面
+        self.agents = load_agent_profiles()
+        self.populate_tabs(self.agents)

@@ -1,4 +1,4 @@
-import sys, os, json
+import sys, os
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QMenu,
     QTextEdit, QPushButton, QLabel, QHBoxLayout,
@@ -6,6 +6,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QProcess, Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap, QKeyEvent
+from pages.i18n.config import get_current_language
+from pages.utils.config import load_agent_profiles, load_user_settings
 
 # Signal to notify parent to switch back to agent selection page
 class Zed(QWidget):
@@ -14,14 +16,15 @@ class Zed(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("智能峡谷 - 聊天与编辑器")
+
         # 读取本智能体的参数信息
-        with open("./configs/agents.json", "r", encoding="utf-8") as f:
-            agents_list = json.load(f)
-        for agent in agents_list:
-            if agent["name"] == "Zed":
-                self.name = agent["nick_name"]
-                self.avatar = agent["avatar"]
-        self.user_avatar = "./assets/avatar/蛮子.jpg"
+        agents_profiles = load_agent_profiles()["Zed"]
+        language = get_current_language()
+        self.name = agents_profiles[language]["nick_name"]
+        self.avatar = agents_profiles["avatar"]
+        user_settings = load_user_settings()
+        self.user_avatar = user_settings["avatar"]
+
         self.current_file_path = None
 
         # 主布局：左右分割

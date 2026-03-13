@@ -1,18 +1,14 @@
-import sys,json
+import sys
 from importlib import import_module
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QLabel, QPushButton,
-    QVBoxLayout, QHBoxLayout, QGridLayout,
-    QListWidget, QListWidgetItem, QStackedWidget, QGraphicsOpacityEffect
+    QApplication, QWidget,QVBoxLayout, QStackedWidget
 )
-from PySide6 import QtCore
-from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
-from PySide6.QtGui import QFont, QPixmap
 
 # 导入其它页面
 from pages.ChooseAgentPage import ChooseAgentPage
 from pages.WelcomePage import WelcomePage
 from pages.i18n import get_i18n_config
+from pages.utils.config import load_agent_profiles
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -29,8 +25,7 @@ class MainWindow(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.stack)
         #读取智能体列表
-        with open ("./configs/agents.json", "r", encoding="utf-8") as f:
-            self.agents = json.load(f)
+        self.agents = load_agent_profiles()
 
         # 先创建ChooseAgentPage，这样可以传递给WelcomePage
         self.choose = ChooseAgentPage(self.agents, self.on_agent_chosen)
@@ -47,7 +42,7 @@ class MainWindow(QWidget):
 
     def on_agent_chosen(self, agent): 
         # 动态加载对应智能体的页面
-        page_module = import_module(f"pages.agents.{agent['page']}")
+        page_module = import_module(f"pages.agents.{agent['name']}")
         PageClass = getattr(page_module, agent["name"])
         page = PageClass()
         # 替换第三页
