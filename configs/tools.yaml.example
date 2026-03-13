@@ -1,14 +1,14 @@
 Zed_embedding_model_config:
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   model: "text-embedding-v4"
-  api_key: "sk-121a8f5dd9f24398a51351a0b8e3e7d3"
+  api_key: "your api key"
 
 Zed_writer_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
-  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"
+  api_key: "your api key"
 
 Sara_job_filter_generate_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
-  api_key: "sk-76c10143bb404f6a81ac472b99f0d688"
+  api_key: "your api key"

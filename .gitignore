@@ -5,6 +5,7 @@
 
 # 忽略包含私密 Key 的真实配置文件
 /configs/models.yaml
+/configs/tools.yaml
 
 ### --- Python 常见缓存与环境 ---
 # 字节码文件
