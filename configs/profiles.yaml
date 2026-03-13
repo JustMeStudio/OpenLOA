@@ -1,4 +1,4 @@
-# 任务配置列表
+# agent profiles configuration
 Zed:
   avatar: "./assets/avatar/Zed.jpg"
   zh:

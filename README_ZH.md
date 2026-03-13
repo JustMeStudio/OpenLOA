@@ -28,13 +28,30 @@
 
 ## 🎯 项目愿景
 
-**智能体联盟 (League of Agents, OpenLOA)** 是一个开源的 AI Agent 开发与应用框架。我们相信，随着大语言模型的发展，Agent 将成为连接 AI 和真实世界的桥梁。
+**OpenLOA (智能体联盟）** 是一个开源的专业化 AI Agent 开发与应用框架。不同于追求通用的 AI Agent 框架，我们通过 **Agent 与工具的紧密耦合设计**，专注于创建高效、生产级别的智能体，彻底解决通用 Agent 的宽泛低效、Token 成本高、难以生产运行的问题。
 
-我们的使命是：
-- ✨ 降低 Agent 的开发门槛，让更多开发者参与其中
-- 🚀 提供开箱即用的 GUI 和 TUI 界面
-- 🛠️ 为开发者提供完整的工具链和最佳实践
-- 🌍 建立一个繁荣的 Agent 生态，共同创造更强大的 AI 应用
+### 🔍 现状与痛点
+
+当前的通用型 AI Agent 存在着诸多问题：
+- 📉 **能力宽泛但不精** - 什么都会一点，什么都干不好
+- 💸 **Token 消耗严重** - 因为 Agent 与工具没有紧密耦合化设计，不能用最少的 Token 准确完成任务，每步都可能走弯路
+- 🎮 **玩具属性过强** - 演示效果好，但难以在生产环境中稳定运行
+- ⏱️ **无法持续服务** - 通用性越强、任务中走弯路越多，导致无意义地积累上下文，算力成本指数级上升
+
+### 💡 我们的解决方案
+
+OpenLOA 致力于创建**专业化、高效化、可运维的 AI Agent 框架**：
+- 🎯 **为实际问题定制** - 每个 Agent 针对特定领域设计和优化，能准确完成任务
+- ⚡ **极致省 Token** - 通过 Agent 与工具的紧密耦合设计，每一步都精准高效，大幅降低 Token 消耗和上下文积累
+- 🔄 **生产级别运维** - 内置监控、日志、持久化存储和错误恢复机制
+- 🤝 **社区共建生态** - 我们提供开源框架，同时征集开发者能解决实际问题、能持续运行的真实 Agent 作品
+
+### 🚀 我们的使命
+
+- ✨ **让更多的人制作和使用 Agent** - 降低开发门槛，提供完整工具链和最佳实践
+- 🚀 **提供开箱即用的 GUI 和 TUI 界面** - 让 Agent 轻松面向用户
+- 🛠️ **持续收录真实可用的 Agent** - 专注能解决实际问题、能持续运行的 Agent
+- 🌍 **建立繁荣的 Agent 生态** - 汇聚社区力量，共同打造生产级别的 AI 应用
 
 ---
 
@@ -69,7 +86,9 @@ pip install -r requirements.txt
 
 ### 2️⃣ 配置模型 API
 
-编辑 `./configs/models.yaml` 文件，为每个 Agent 及其工具配置模型和 API Key：
+OpenLOA 为了更好的组织配置，将配置分为两个文件：
+
+**`./configs/models.yaml`** - 专门管理 Agent 大脑使用的 LLM：
 
 ```yaml
 # Zed Agent 配置
@@ -78,35 +97,47 @@ Zed_agent_model_config:
   model: "deepseek-chat"
   api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
 
-Zed_writer_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
-
 # Sara Agent 配置
 Sara_agent_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
 
-Sara_job_filter_generate_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
-
 # 你的自定义 Agent 配置
-MyCustomAgent_model_config:
+MyCustomAgent_agent_model_config:
   base_url: "https://api.openai.com/v1"
   model: "gpt-4"
   api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
 ```
 
-> 💡 **提示**：
-> - **Agent 可以有多个模型配置**：不同的任务可以使用不同的模型（如：主要任务用 `deepseek-chat`，复杂推理用 `deepseek-reasoner`）
-> - **命名规范**：`{AgentName}_{task_name}_model_config`
-> - **支持多个提供商**：可以同时配置 OpenAI、Deepseek、Anthropic 等不同的 API 服务商
-> - **在 Agent 代码中引用**：在你的 Agent 代码中加载对应的配置即可
+**`./configs/tools.yaml`** - 管理工具或特殊任务使用的 API 配置：
 
+```yaml
+# Zed Agent 的文案写作任务配置
+Zed_writer_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+
+# Sara Agent 的4位数筛选任务配置
+Sara_job_filter_generate_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-reasoner"
+  api_key: "sk-xxxxxxxxxxxxx"  # 替换为你的 API Key
+
+# 你的自定义工具配置
+MyCustomTools_external_api_config:
+  api_key: "your-external-api-key"
+  base_url: "https://external-api.example.com"
+```
+
+> 💡 **提示**：
+> - **Agent 大脑配置** - 配置在 `models.yaml` （主模型，管理 Agent 的初算法）
+> - **工具/特殊任务配置** - 配置在 `tools.yaml` （如文案写作、或位筛选等批量处理）
+> - **命名规范**：`{AgentName}_{task_name}_model_config` 或 `{ToolName}_{function_name}_config`
+> - **支持多个提供商**：可以同时配置 OpenAI、Deepseek、Anthropic 等不同的 API 服务商
+> - **在 Agent 代码中引用**：使用 `load_model_config()` 加载对应的配置即可
+> - **在工具代码中引用**：使用 `load_tool_config()` 加载工具体需要的外部 API 配置
 ### 3️⃣ 启动应用
 
 #### 📱 启动 GUI 版本（推荐新手）
@@ -233,7 +264,7 @@ if __name__ == "__main__":
 ```python
 # backend/tools/MyCustomTools.py
 import json
-from utils.config import load_model_config
+from utils.config import load_model_config, load_tool_config
 from utils.com import request_LLM_api
 
 # ==================== 工具实现 ====================
@@ -270,8 +301,8 @@ def generate_summary(content: str) -> str:
     """
     # 在工具内部调用 LLM API 的示例
     
-    # 1️⃣ 加载模型配置
-    model_config = load_model_config("MyCustomAgent_agent_model_config")
+    # 1️⃣ 从 tools.yaml 加载工具配置
+    model_config = load_tool_config("MyCustomTools_summary_model_config")
     
     # 2️⃣ 定义提示词
     system_prompt = "你是一个专业的文本摘要助手，能够快速提炼内容要点。"
@@ -359,11 +390,11 @@ tools = [
 当工具需要 LLM 的支持时（如数据分析、文本生成等），可使用 `request_LLM_api()` 函数：
 
 ```python
-from utils.config import load_model_config
+from utils.config import load_tool_config
 from utils.com import request_LLM_api
 
-# 加载模型配置
-model_config = load_model_config("Config_Name")
+# 加载工具配置(这里的模型调用属于工具内调用，所以我们配置在tools.yaml方便管理)
+model_config = load_tool_config("Config_Name")
 
 # 调用 LLM API - 三个必需参数
 response = request_LLM_api(
@@ -390,24 +421,32 @@ local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_to
 
 ### 第三步：配置 Agent 信息
 
-编辑 `./configs/agents.json`，添加你的 Agent 配置：
+编辑 `./configs/profiles.yaml`，添加你的 Agent 配置。该格式支持多语言配置：
 
-```json
-{
-    "name": "MyCustomAgent",
-    "type": "文本处理",
-    "nick_name": "我的智能体",
-    "description": "这是我定制的超强智能体，能够...",
-    "avatar": "./assets/avatar/MyCustomAgent.jpg",
-    "model": "gpt-4",
-    "tools": ["search_information", "analyze_data"]
-}
+```yaml
+MyCustomAgent:
+  avatar: "./assets/avatar/MyCustomAgent.jpg"
+  zh:
+    type: "文本处理"
+    nick_name: "我的智能体"
+    description: "这是我定制的超强智能体，能够..."
+  en:
+    type: "Text Processing"
+    nick_name: "My Intelligent Agent"
+    description: "This is my custom powerful agent that can..."
 ```
+
+**主要特性：**
+- ✅ **多语言支持**: 支持中文 (zh) 和英文 (en) 的描述
+- ✅ **统一管理头像**: 只需指定一次头像路径
+- ✅ **任务分类**: 根据任务类类组织 Agent
+- ✅ **一键切换语言**: UI 会根据用户设置自动加载正确的语言
 
 ### 第四步：配置模型和 API
 
-在 `./configs/models.yaml` 中为你的 Agent 配置所需的模型：
+在 `./configs/models.yaml` 中为你的 Agent 配置所需的 LLM 模型。如果工具需要外部 API，在 `./configs/tools.yaml` 中配置：
 
+**Agent 大脑模型配置 (models.yaml)：**
 ```yaml
 # MyCustomAgent 主要任务配置
 MyCustomAgent_agent_model_config:
@@ -422,6 +461,14 @@ MyCustomAgent_reasoning_model_config:
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
+**工具外部 API 配置 (tools.yaml)：**
+```yaml
+# 工具可能需要自己的 API Key
+MyCustomTools_external_api_config:
+  api_key: "your-external-api-key"
+  base_url: "https://external-api.example.com"
+```
+
 在你的 Agent 代码中使用 `load_model_config()` 函数加载配置：
 
 ```python
@@ -430,51 +477,186 @@ from utils.config import load_model_config
 # 加载主要任务的模型配置
 agent_config = load_model_config("MyCustomAgent_agent_model_config")
 
-# 加载复杂推理任务的模型配置（可选）
-reasoning_config = load_model_config("MyCustomAgent_reasoning_model_config")
-
 # 配置会自动被传递给 chat() 函数使用
 await chat(agent_config, system_prompt, tools, tools_registry)
 ```
 
 ### 第五步（可选）：创建自定义 GUI 页面
 
-在 `./pages/agents/` 下创建专属的 GUI 页面：
+在 `./pages/agents/` 下创建专属的 GUI 页面。通过 QProcess 启动后端程序，使用 stdin/stdout 进行通信：
 
 ```python
 # pages/agents/MyCustomAgent.py
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit
-from backend.MyCustomAgent import MyCustomAgent
+import os
+import json
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QLabel, QScrollArea
+from PySide6.QtCore import Qt, QProcess, QTimer
+from PySide6.QtGui import QPixmap
+from pages.utils.config import load_agent_profiles, load_user_settings
+from pages.i18n import get_current_language
 
 class MyCustomAgentPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.agent = MyCustomAgent(api_key="your-api-key")
+        
+        # 从 profiles.yaml 加载 Agent 配置
+        agents_profiles = load_agent_profiles()["MyCustomAgent"]
+        language = get_current_language()
+        
+        # 获取 Agent 信息
+        self.agent_name = agents_profiles[language]["nick_name"]
+        self.avatar_path = agents_profiles["avatar"]
+        
+        # 从用户设置中加载用户信息
+        user_settings = load_user_settings()
+        self.user_avatar = user_settings["avatar"]
+        
+        # Agent 进程
+        self.process = None
+        
         self.init_ui()
+        self.start_backend()
     
     def init_ui(self):
-        layout = QVBoxLayout()
+        """初始化UI"""
+        main_layout = QVBoxLayout(self)
         
-        self.input_field = QLineEdit()
-        self.input_field.setPlaceholderText("输入你的需求...")
+        # 标题栏
+        title_layout = QHBoxLayout()
+        avatar_label = QLabel()
+        if os.path.isfile(self.avatar_path):
+            pix = QPixmap(self.avatar_path)
+            if not pix.isNull():
+                avatar_pix = pix.scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                avatar_label.setPixmap(avatar_pix)
         
-        self.run_button = QPushButton("执行")
-        self.run_button.clicked.connect(self.run_agent)
+        name_label = QLabel(self.agent_name)
+        name_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         
-        self.output_field = QTextEdit()
-        self.output_field.setReadOnly(True)
+        title_layout.addWidget(avatar_label)
+        title_layout.addWidget(name_label)
+        title_layout.addStretch()
+        exit_btn = QPushButton("返回")
+        title_layout.addWidget(exit_btn)
         
-        layout.addWidget(self.input_field)
-        layout.addWidget(self.run_button)
-        layout.addWidget(self.output_field)
+        main_layout.addLayout(title_layout)
         
-        self.setLayout(layout)
+        # 聊天区域
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.chat_container = QWidget()
+        self.chat_layout = QVBoxLayout(self.chat_container)
+        self.chat_layout.addStretch()
+        self.scroll_area.setWidget(self.chat_container)
+        main_layout.addWidget(self.scroll_area)
+        
+        # 输入区域
+        input_layout = QHBoxLayout()
+        self.input_field = QTextEdit()
+        self.input_field.setMaximumHeight(60)
+        self.input_field.setPlaceholderText("输入消息...")
+        
+        send_btn = QPushButton("发送")
+        send_btn.clicked.connect(self.send_message)
+        
+        input_layout.addWidget(self.input_field)
+        input_layout.addWidget(send_btn)
+        main_layout.addLayout(input_layout)
+        
+        self.setLayout(main_layout)
     
-    def run_agent(self):
-        user_input = self.input_field.text()
-        result = self.agent.run(user_input)
-        self.output_field.setText(result)
+    def start_backend(self):
+        """启动后端 Agent 进程"""
+        self.process = QProcess(self)
+        self.process.readyReadStandardOutput.connect(self.on_stdout)
+        self.process.setWorkingDirectory("./backend")
+        self.process.start("python", ["-u", "MyCustomAgent.py"])
+    
+    def send_message(self):
+        """发送消息到后端"""
+        text = self.input_field.toPlainText().strip()
+        if text:
+            # 显示用户消息气泡
+            self.add_chat_bubble(self.user_avatar, "你", text, is_sender=True)
+            
+            # 清空输入框
+            self.input_field.clear()
+            
+            # 将消息发送到后端
+            self.process.write((text + "\n").encode("utf-8"))
+    
+    def add_chat_bubble(self, avatar_path, name, message, is_sender=False):
+        """添加聊天气泡"""
+        bubble = ChatBubble(avatar_path, name, message, is_sender)
+        self.chat_layout.insertWidget(self.chat_layout.count() - 1, bubble)
+        # 自动滚动到底部
+        QTimer.singleShot(100, self.scroll_to_bottom)
+    
+    def scroll_to_bottom(self):
+        """滚动到消息末尾"""
+        self.scroll_area.verticalScrollBar().setValue(
+            self.scroll_area.verticalScrollBar().maximum()
+        )
+    
+    def on_stdout(self):
+        """处理来自后端的输出"""
+        raw = bytes(self.process.readAllStandardOutput())
+        try:
+            text = raw.decode('utf-8').strip()
+        except Exception:
+            text = raw.decode('mbcs', errors='replace').strip()
+        
+        if text:
+            # 显示 Agent 消息气泡
+            self.add_chat_bubble(self.avatar_path, self.agent_name, text, is_sender=False)
+
+class ChatBubble(QWidget):
+    """聊天气泡组件"""
+    def __init__(self, avatar_path, name, message, is_sender=False):
+        super().__init__()
+        layout = QHBoxLayout(self)
+        
+        # 头像
+        avatar_label = QLabel()
+        if avatar_path and os.path.isfile(avatar_path):
+            pix = QPixmap(avatar_path)
+            if not pix.isNull():
+                avatar_pix = pix.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                avatar_label.setPixmap(avatar_pix)
+        avatar_label.setFixedSize(40, 40)
+        
+        # 消息气泡
+        text_label = QLabel()
+        text_html = f"<b>{name}</b><br/><span style='font-size:14px;'>{message}</span>"
+        text_label.setText(text_html)
+        text_label.setWordWrap(True)
+        text_label.setStyleSheet(f"""
+            QLabel {{
+                background-color: {"#DCF8C6" if is_sender else "#FFFFFF"};
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                padding: 8px;
+            }}
+        """)
+        
+        # 布局
+        if is_sender:
+            layout.addStretch()
+            layout.addWidget(text_label)
+            layout.addWidget(avatar_label)
+        else:
+            layout.addWidget(avatar_label)
+            layout.addWidget(text_label)
+            layout.addStretch()
 ```
+
+**关键点说明：**
+
+✅ **进程通信** - 通过 `QProcess` 启动后端程序，用 stdin/stdout 通信  
+✅ **配置加载** - 使用 `load_agent_profiles()` 获取多语言 Agent 信息  
+✅ **聊天气泡** - 自定义聊天气泡UI组件，支持左右不同样式  
+✅ **消息处理** - 监听后端输出，实时显示Agent回复  
+✅ **异步处理** - 后端独立运行，前端通过信号与其通信
 
 ---
 
@@ -513,9 +695,10 @@ OpenLOA/
 │       └── Zed.py
 │
 └── configs/                   # 配置文件
-    ├── agents.json           # Agent 配置
-    ├── models.yaml           # 模型配置
-    └── settings.yaml         # 应用配置
+    ├── models.yaml           # Agent 大脑使用的 LLM 模型配置
+    ├── tools.yaml            # 工具 API 配置
+    ├── profiles.yaml         # Agent 信息和资料（支持多语言）
+    └── settings.yaml         # 应用设置
 ```
 
 ---
@@ -543,7 +726,7 @@ OpenLOA 提供了多个开箱即用的 Agent：
 
 - Python 3.8+
 - pip 或其他包管理工具
-- 有效的 LLM API Key（OpenAI、Anthropic 等）
+- 有效的 LLM API Key（OpenAI、Anthropic、Qwen、Deepseek 等）
 
 ### 推荐的开发流程
 
@@ -586,13 +769,13 @@ RAG 是一种先进的 AI 技术，结合了检索（Retrieval）和生成（Gen
 
 #### 第一步：配置 Embedding 模型
 
-在 `./configs/models.yaml` 中添加向量化模型配置：
+在 `./configs/tools.yaml` 中添加向量化模型配置（Embedding 是工具相关配置）：
 
 ```yaml
 # MyCustomAgent 向量化模型配置（用于 RAG 检索）
 MyCustomAgent_embedding_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "text-embedding-3-small"      # 将文本转换为向量
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  model: "text-embedding-v4"      # 将文本转换为向量
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
@@ -606,7 +789,7 @@ from utils.config import load_model_config
 from ulid import ULID
 
 # 1️⃣ 加载向量化模型配置（从 YAML 读取）
-embedding_model_config = load_model_config("MyCustomAgent_embedding_model_config")
+embedding_model_config = load_tool_config("MyCustomAgent_embedding_model_config")
 
 # 2️⃣ 初始化 OpenAI 客户端（使用配置中的参数）
 oa_client = OpenAI(

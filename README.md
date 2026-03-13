@@ -28,13 +28,30 @@
 
 ## 🎯 Vision
 
-**OpenLOA (League of Agents)** is an open-source AI Agent development and application framework. We believe that as Large Language Models evolve, Agents will become the bridge connecting AI to the real world.
+**OpenLOA (League of Agents)** is an open-source professional-grade AI Agent development and application framework. Unlike generic AI Agent frameworks, we focus on creating efficient, production-ready intelligent agents through **tight coupling between Agents and tools**, fundamentally solving the problems of generic Agents: broad but shallow capabilities, high token costs, and difficulty running in production.
 
-Our Mission:
-- ✨ Lower the barrier to Agent development and enable more developers to participate
-- 🚀 Provide out-of-the-box GUI and TUI interfaces
-- 🛠️ Provide developers with a complete toolchain and best practices
-- 🌍 Build a thriving Agent ecosystem and create more powerful AI applications together
+### 🔍 Current Challenges
+
+Today's general-purpose AI Agents face significant limitations:
+- 📉 **Broad but shallow capabilities** - Can handle many tasks, but excel at none
+- 💸 **Excessive token consumption** - Without tight coupling between Agents and tools, they cannot complete tasks with minimal tokens and often make inefficient decisions at each step
+- 🎮 **Limited production readiness** - Works well in demos, struggles in real-world deployment
+- ⏱️ **Unable to sustain operation** - The more generic the design, the more detours in specific tasks, leading to meaningless context accumulation and exponential cost growth
+
+### 💡 Our Solution
+
+OpenLOA is building **specialized, efficient, and production-ready AI Agent framework**:
+- 🎯 **Tailored for real problems** - Each Agent is designed and optimized for specific domains, capable of completing tasks accurately
+- ⚡ **Token-efficient** - Through tight coupling between Agents and tools, every step is precise and efficient, drastically reducing token consumption and context accumulation
+- 🔄 **Production-grade reliability** - Built-in monitoring, logging, persistent storage and error recovery
+- 🤝 **Community-driven ecosystem** - We provide the open framework, while welcoming real, production-ready Agent contributions that solve actual problems and can sustain operation
+
+### 🚀 Our Mission
+
+- ✨ **Empower more people to create and use Agents** - Lower development barriers, provide complete toolchain and best practices
+- 🚀 **Provide ready-to-use GUI and TUI interfaces** - Make Agents easily accessible to end users
+- 🛠️ **Curate real, production-ready Agents** - Focus on Agents that solve actual problems and can sustain operation, not toys
+- 🌍 **Build a thriving Agent ecosystem** - Unite the community to create production-grade AI applications together
 
 ---
 
@@ -69,7 +86,9 @@ pip install -r requirements.txt
 
 ### 2️⃣ Configure Model API
 
-Edit `./configs/models.yaml` to configure models and API keys for each Agent:
+OpenLOA separates configuration into two files for better organization:
+
+**`./configs/models.yaml`** - Manages LLM configurations for Agent brains:
 
 ```yaml
 # Zed Agent Configuration
@@ -78,34 +97,41 @@ Zed_agent_model_config:
   model: "deepseek-chat"
   api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
-Zed_writer_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
-
 # Sara Agent Configuration
 Sara_agent_model_config:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 
-Sara_job_filter_generate_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "deepseek-reasoner"
-  api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
-
 # Your Custom Agent Configuration
-MyCustomAgent_model_config:
+MyCustomAgent_agent_model_config:
   base_url: "https://api.openai.com/v1"
   model: "gpt-4"
   api_key: "sk-xxxxxxxxxxxxx"  # Replace with your API Key
 ```
 
+**`./configs/tools.yaml`** - Manages API keys for local custom tools (when network calls are needed):
+
+```yaml
+# Tool-specific API configurations
+MyCustomTools_embedding_model_config:
+  base_url: "https://api.deepseek.com"
+  model: "text-embedding-3-small"
+  api_key: "sk-xxxxxxxxxxxxx"
+
+MyCustomTools_web_search_config:
+  api_key: "your-search-api-key"
+  base_url: "https://api.example.com"
+```
+
 > 💡 **Tips**:
 > - **Agents can have multiple model configurations**: Different tasks can use different models
-> - **Naming convention**: `{AgentName}_{task_name}_model_config`
+> - **LLM Models**: Configure in `models.yaml` (agent brains, reasoning models, embedding models)
+> - **Tool APIs**: Configure in `tools.yaml` (external service APIs needed by tools)
+> - **Naming convention**: `{AgentName}_{task_name}_model_config` or `{ToolName}_{function_name}_config`
 > - **Multiple providers**: Configure OpenAI, Deepseek, Anthropic and other providers simultaneously
-> - **Reference in Agent code**: Load corresponding configuration in your Agent code
+> - **Reference in code**: Load configurations using `load_model_config()` in Agent code
+> - **Reference in tool code**: Use `load_tool_config()` to load external API configurations required by tools
 
 ### 3️⃣ Launch Application
 
@@ -233,7 +259,7 @@ Create your tool package file in `./backend/tools/`:
 ```python
 # backend/tools/MyCustomTools.py
 import json
-from utils.config import load_model_config
+from utils.config import load_model_config, load_tool_config
 from utils.com import request_LLM_api
 
 # ==================== Tool Implementation ====================
@@ -270,8 +296,8 @@ def generate_summary(content: str) -> str:
     """
     # Example of calling LLM API inside tool
     
-    # 1️⃣ Load model configuration
-    model_config = load_model_config("MyCustomAgent_agent_model_config")
+    # 1️⃣ Load tool configuration from tools.yaml
+    model_config = load_tool_config("MyCustomTools_summary_model_config")
     
     # 2️⃣ Define prompts
     system_prompt = "You are a professional text summarization assistant."
@@ -390,24 +416,32 @@ local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_to
 
 ### Step 3: Configure Agent Info
 
-Edit `./configs/agents.json` to add your Agent configuration:
+Edit `./configs/profiles.yaml` to add your Agent configuration. This format supports multi-language configuration:
 
-```json
-{
-    "name": "MyCustomAgent",
-    "type": "Text Processing",
-    "nick_name": "My Intelligent Agent",
-    "description": "This is my custom powerful agent that can...",
-    "avatar": "./assets/avatar/MyCustomAgent.jpg",
-    "model": "gpt-4",
-    "tools": ["search_information", "analyze_data"]
-}
+```yaml
+MyCustomAgent:
+  avatar: "./assets/avatar/MyCustomAgent.jpg"
+  zh:
+    type: "文本处理"
+    nick_name: "我的智能体"
+    description: "这是我定制的超强智能体，能够..."
+  en:
+    type: "Text Processing"
+    nick_name: "My Intelligent Agent"
+    description: "This is my custom powerful agent that can..."
 ```
+
+**Key Features:**
+- ✅ **Multi-language support**: Configure Chinese (zh) and English (en) labels
+- ✅ **Centralized avatar**: Specify agent avatar path once
+- ✅ **Type classification**: Organize agents by task type
+- ✅ **Easy language switching**: UI automatically loads correct language based on user settings
 
 ### Step 4: Configure Models and API
 
-Configure required models for your Agent in `./configs/models.yaml`:
+Configure required Agent LLM models in `./configs/models.yaml`. If your tools need external APIs, configure them in `./configs/tools.yaml`:
 
+**For Agent Models (models.yaml):**
 ```yaml
 # MyCustomAgent main task configuration
 MyCustomAgent_agent_model_config:
@@ -422,6 +456,14 @@ MyCustomAgent_reasoning_model_config:
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
+**For Tool APIs (tools.yaml):**
+```yaml
+# Your tools might need their own API keys
+MyCustomTools_external_api_config:
+  api_key: "your-external-api-key"
+  base_url: "https://external-api.example.com"
+```
+
 Use `load_model_config()` function to load configuration in your Agent code:
 
 ```python
@@ -430,51 +472,185 @@ from utils.config import load_model_config
 # Load main task model configuration
 agent_config = load_model_config("MyCustomAgent_agent_model_config")
 
-# Load complex reasoning task model configuration (optional)
-reasoning_config = load_model_config("MyCustomAgent_reasoning_model_config")
-
 # Configuration will be automatically passed to chat() function
 await chat(agent_config, system_prompt, tools, tools_registry)
 ```
 
 ### Step 5 (Optional): Create Custom GUI Page
 
-Create dedicated GUI page in `./pages/agents/`:
+Create dedicated GUI page in `./pages/agents/`. Start the backend program via QProcess and communicate through stdin/stdout:
 
 ```python
 # pages/agents/MyCustomAgent.py
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit
-from backend.MyCustomAgent import MyCustomAgent
+import os
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QLabel, QScrollArea
+from PySide6.QtCore import Qt, QProcess, QTimer
+from PySide6.QtGui import QPixmap
+from pages.utils.config import load_agent_profiles, load_user_settings
+from pages.i18n import get_current_language
 
 class MyCustomAgentPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.agent = MyCustomAgent(api_key="your-api-key")
+        
+        # Load agent configuration from profiles.yaml
+        agents_profiles = load_agent_profiles()["MyCustomAgent"]
+        language = get_current_language()
+        
+        # Get agent information
+        self.agent_name = agents_profiles[language]["nick_name"]
+        self.avatar_path = agents_profiles["avatar"]
+        
+        # Load user information from settings
+        user_settings = load_user_settings()
+        self.user_avatar = user_settings["avatar"]
+        
+        # Agent process
+        self.process = None
+        
         self.init_ui()
+        self.start_backend()
     
     def init_ui(self):
-        layout = QVBoxLayout()
+        """Initialize UI"""
+        main_layout = QVBoxLayout(self)
         
-        self.input_field = QLineEdit()
-        self.input_field.setPlaceholderText("Enter your request...")
+        # Title bar
+        title_layout = QHBoxLayout()
+        avatar_label = QLabel()
+        if os.path.isfile(self.avatar_path):
+            pix = QPixmap(self.avatar_path)
+            if not pix.isNull():
+                avatar_pix = pix.scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                avatar_label.setPixmap(avatar_pix)
         
-        self.run_button = QPushButton("Execute")
-        self.run_button.clicked.connect(self.run_agent)
+        name_label = QLabel(self.agent_name)
+        name_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         
-        self.output_field = QTextEdit()
-        self.output_field.setReadOnly(True)
+        title_layout.addWidget(avatar_label)
+        title_layout.addWidget(name_label)
+        title_layout.addStretch()
+        exit_btn = QPushButton("Back")
+        title_layout.addWidget(exit_btn)
         
-        layout.addWidget(self.input_field)
-        layout.addWidget(self.run_button)
-        layout.addWidget(self.output_field)
+        main_layout.addLayout(title_layout)
         
-        self.setLayout(layout)
+        # Chat area
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.chat_container = QWidget()
+        self.chat_layout = QVBoxLayout(self.chat_container)
+        self.chat_layout.addStretch()
+        self.scroll_area.setWidget(self.chat_container)
+        main_layout.addWidget(self.scroll_area)
+        
+        # Input area
+        input_layout = QHBoxLayout()
+        self.input_field = QTextEdit()
+        self.input_field.setMaximumHeight(60)
+        self.input_field.setPlaceholderText("Enter message...")
+        
+        send_btn = QPushButton("Send")
+        send_btn.clicked.connect(self.send_message)
+        
+        input_layout.addWidget(self.input_field)
+        input_layout.addWidget(send_btn)
+        main_layout.addLayout(input_layout)
+        
+        self.setLayout(main_layout)
     
-    def run_agent(self):
-        user_input = self.input_field.text()
-        result = self.agent.run(user_input)
-        self.output_field.setText(result)
+    def start_backend(self):
+        """Start the backend Agent process"""
+        self.process = QProcess(self)
+        self.process.readyReadStandardOutput.connect(self.on_stdout)
+        self.process.setWorkingDirectory("./backend")
+        self.process.start("python", ["-u", "MyCustomAgent.py"])
+    
+    def send_message(self):
+        """Send message to backend"""
+        text = self.input_field.toPlainText().strip()
+        if text:
+            # Display user message bubble
+            self.add_chat_bubble(self.user_avatar, "You", text, is_sender=True)
+            
+            # Clear input field
+            self.input_field.clear()
+            
+            # Send message to backend
+            self.process.write((text + "\n").encode("utf-8"))
+    
+    def add_chat_bubble(self, avatar_path, name, message, is_sender=False):
+        """Add chat bubble"""
+        bubble = ChatBubble(avatar_path, name, message, is_sender)
+        self.chat_layout.insertWidget(self.chat_layout.count() - 1, bubble)
+        # Auto-scroll to bottom
+        QTimer.singleShot(100, self.scroll_to_bottom)
+    
+    def scroll_to_bottom(self):
+        """Scroll to message end"""
+        self.scroll_area.verticalScrollBar().setValue(
+            self.scroll_area.verticalScrollBar().maximum()
+        )
+    
+    def on_stdout(self):
+        """Handle output from backend"""
+        raw = bytes(self.process.readAllStandardOutput())
+        try:
+            text = raw.decode('utf-8').strip()
+        except Exception:
+            text = raw.decode('mbcs', errors='replace').strip()
+        
+        if text:
+            # Display agent message bubble
+            self.add_chat_bubble(self.avatar_path, self.agent_name, text, is_sender=False)
+
+class ChatBubble(QWidget):
+    """Chat bubble component"""
+    def __init__(self, avatar_path, name, message, is_sender=False):
+        super().__init__()
+        layout = QHBoxLayout(self)
+        
+        # Avatar
+        avatar_label = QLabel()
+        if avatar_path and os.path.isfile(avatar_path):
+            pix = QPixmap(avatar_path)
+            if not pix.isNull():
+                avatar_pix = pix.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                avatar_label.setPixmap(avatar_pix)
+        avatar_label.setFixedSize(40, 40)
+        
+        # Message bubble
+        text_label = QLabel()
+        text_html = f"<b>{name}</b><br/><span style='font-size:14px;'>{message}</span>"
+        text_label.setText(text_html)
+        text_label.setWordWrap(True)
+        text_label.setStyleSheet(f"""
+            QLabel {{
+                background-color: {"#DCF8C6" if is_sender else "#FFFFFF"};
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                padding: 8px;
+            }}
+        """)
+        
+        # Layout
+        if is_sender:
+            layout.addStretch()
+            layout.addWidget(text_label)
+            layout.addWidget(avatar_label)
+        else:
+            layout.addWidget(avatar_label)
+            layout.addWidget(text_label)
+            layout.addStretch()
 ```
+
+**Key Points:**
+
+✅ **Process Communication** - Use `QProcess` to start backend, communicate via stdin/stdout  
+✅ **Config Loading** - Use `load_agent_profiles()` to get multi-language agent information  
+✅ **Chat Bubbles** - Custom chat bubble UI component with different styles for left/right  
+✅ **Message Handling** - Listen to backend output, display agent replies in real-time  
+✅ **Async Processing** - Backend runs independently, frontend communicates via signals
 
 ---
 
@@ -513,9 +689,10 @@ OpenLOA/
 │       └── Zed.py
 │
 └── configs/                   # Configuration files
-    ├── agents.json           # Agent configuration
-    ├── models.yaml           # Model configuration
-    └── settings.yaml         # Application configuration
+    ├── models.yaml           # LLM model configuration for Agents
+    ├── tools.yaml            # Tool API configuration
+    ├── profiles.yaml         # Agent profiles and info (multi-language)
+    └── settings.yaml         # Application settings
 ```
 
 ---
@@ -591,8 +768,8 @@ Add embedding model configuration in `./configs/models.yaml`:
 ```yaml
 # MyCustomAgent embedding model configuration (for RAG retrieval)
 MyCustomAgent_embedding_model_config:
-  base_url: "https://api.deepseek.com"
-  model: "text-embedding-3-small"      # Convert text to vectors
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  model: "text-embedding-v4"      # Convert text to vectors
   api_key: "sk-xxxxxxxxxxxxx"
 ```
 
@@ -602,11 +779,11 @@ MyCustomAgent_embedding_model_config:
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
-from utils.config import load_model_config
+from utils.config import load_tool_config
 from ulid import ULID
 
-# 1️⃣ Load embedding model configuration (from YAML)
-embedding_model_config = load_model_config("MyCustomAgent_embedding_model_config")
+# 1️⃣ Load embedding model configuration (from tool YAML)
+embedding_model_config = load_tool_config("MyCustomAgent_embedding_model_config")
 
 # 2️⃣ Initialize OpenAI client (using configuration parameters)
 oa_client = OpenAI(

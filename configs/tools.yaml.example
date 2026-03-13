@@ -1,3 +1,4 @@
+# manage api_key of local defined tools
 Zed_embedding_model_config:
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   model: "text-embedding-v4"
