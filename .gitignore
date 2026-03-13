@@ -1,11 +1,11 @@
 ### --- OpenLOA 特定排除项 ---
 # 排除你提到的本地项目存储和向量数据库
-/backend/projects/
-/backend/chroma_db/
+backend/projects/
+backend/chroma_db/
 
 # 忽略包含私密 Key 的真实配置文件
-/configs/models.yaml
-/configs/tools.yaml
+configs/models.yaml
+configs/tools.yaml
 
 ### --- Python 常见缓存与环境 ---
 # 字节码文件
@@ -23,7 +23,7 @@ include/
 lib/
 
 # 外部库文件夹 (由 pip 安装)
-/site/
+site/
 
 ### --- 开发工具与系统文件 ---
 # 编辑器配置 (VS Code / PyCharm)
