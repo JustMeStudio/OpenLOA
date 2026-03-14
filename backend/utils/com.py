@@ -87,7 +87,7 @@ async def chat(model_config, system_prompt: str = "", tools=[], tool_registry={}
                         "content": content
                     })
             else:
-                qprint(f"影分身-劫：{message.content}\n")
+                qprint(f"AI：{message.content}\n")
                 messages.append({
                     "role": "assistant",
                     "content": message.content
@@ -95,8 +95,8 @@ async def chat(model_config, system_prompt: str = "", tools=[], tool_registry={}
                 break
 
 
-
-def request_LLM_api(model_config:dict, prompt:str, system_prompt:str=""):
+# get text response from LLM API, with retry mechanism for network issues
+def request_LLM_api(model_config:dict, prompt:str, system_prompt:str="", response_format=None):
     messages = [{"role": "system", "content":system_prompt}]
     messages.append({"role": "user", "content": prompt})
     client = OpenAI(api_key= model_config["api_key"], base_url= model_config["base_url"],)
@@ -107,6 +107,8 @@ def request_LLM_api(model_config:dict, prompt:str, system_prompt:str=""):
             completion = client.chat.completions.create(
                 model= model_config["model"],
                 messages= messages,
+                response_format= response_format,
+                temperature= 1.0
             )
             content = completion.choices[0].message.content
             return content

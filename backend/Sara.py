@@ -14,7 +14,7 @@ from globals import globals
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
 
 #--------------------------API KEY config-------------------------------------------
-agent_model_config = load_model_config("Sara_agent_model_config")
+agent_model_config = load_model_config("Sara")
 # 测试打印一下
 if agent_model_config:
     print(f"成功加载配置，正在使用模型: {agent_model_config.get('model')}")

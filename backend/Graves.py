@@ -13,48 +13,49 @@ from globals import globals
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
 
 #--------------------------API KEY config-------------------------------------------
-agent_model_config = load_model_config("Zed")
+agent_model_config = load_model_config("Graves")
 # 测试打印一下
 if agent_model_config:
     print(f"成功加载配置，正在使用模型: {agent_model_config.get('model')}")
 
 #-----------------------system prompt config-------------------------------------
-system_prompt = (
-    "你是劫（Zed），一个仿风格写手，能像原作者的分身一般复刻他的写作风格完成写作任务\n"
-    "你的工作流程：\n"
-    "1.当用户发来一句话时，首先询问客户这是不是本次写作的线索\n"
-    "-如果用户回答是，就调用写作工具根据该线索写作\n"
-    "-如果用户回答不是，就询问客户本次写作的完整线索是什么\n"
-    "2.当你完成创作后，告诉用户在右边的编辑框中查看并编辑你的创作结果，编辑完以后可以点击'保存并投喂'按钮将最终结果保存在我的数据库，方便下次创作时参考\n"
-    "3.除非你收到用户指令将创作内容录入到数据库，否则任何时候不要擅自录入！"
-)
+system_prompt = """# 角色设定
 
+你是一位专业的简历生成助手。你的核心任务是帮助用户高效、美观地创建个人简历。
 
+## 工作流程
+
+### 1. 信息收集
+- 请用户尽可能提供**完整详实的个人资料**，包括：基本信息、教育背景、工作经历、项目经验、技能特长、证书奖项等。
+- **样式风格确认**：在生成前，请主动询问用户需要的简历风格（如：**经典商务、互联网极简、学术严谨、创意彩色**等），以确保 HTML 排版符合用户预期。
+- 若用户提供的信息不完整或模糊，请**主动、友好地追问**，确保内容充实且具有竞争力。
+
+### 2. 证件照提醒
+- 如果用户**未主动上传证件照**，请温馨提醒：
+  > “为了提升简历的专业度和视觉效果，建议您上传一张标准证件照。我可以将其自动嵌入到简历中。”
+
+### 3. 简历生成
+- 在确认信息完整及风格偏好后，调用 `generate_cv` 工具开始生成简历html文件。
+
+## 沟通原则
+- 保持**专业、耐心、细致**的语气。
+- 始终以用户为中心，致力于打造一份**令人印象深刻、高度个性化的高质量简历**。"""
 #--------------------------------------------------------------------------------
 async def main():
     try:
         #开场白
-        qprint("无形之刃，最为致命\n\n"
-               "我是<影分身-劫>，我可以持续学习并模仿你本人的写作风格，帮你写汇报\n\n"
-               "如果你有以下痛点：\n"
-               "1.你长期需要写日报/周报，但每次的新信息其实并不多（水一水就能过去的那种）\n"
-               "2.给一般的AI写，出来的结果AI感太强，一看就是AI写的，不是你本人的风格\n\n"
-               "那么，恭喜你！我是为你量身定制的：\n"
-               "1.你只需要用简单的几句话，告诉我本次汇报中的重点信息\n"
-               "2.我会从你以往海量的汇报中筛选出最接的内容作为参考，再结合你提供的重点信息，写出一篇和你风格非常接近的汇报\n"
-               "3.你可以把最终成品再投喂给我，下次写汇报我也会参考它\n"
-               "4.简而言之，我会越来越像你！"
-        )
+        qprint("我是墨菲特，我可以帮你制作简历！\n告诉我你的")
 
         #为本次项目创建资源目录(如果后续需要保存结果到本地)
         # time_stamp = str(int(time.time()))
-        # globals.PROJECT_NAME = project_name = f"project_{time_stamp}"
-        # globals.PROJECT_PATH = project_path = os.path.abspath(f"./projects/{project_name}")
-        # os.makedirs(project_path, exist_ok=True)   
+        globals.PROJECT_NAME = project_name = f"Graves"
+        globals.PROJECT_FILE_NAME = project_file_name = "简历.html"
+        globals.PROJECT_PATH = project_path = os.path.abspath(f"./projects/{project_name}")
+        globals.PROJECT_FILE_PATH = os.path.abspath(f"{project_path}/{project_file_name}")
 
         #声明本地自定义tools
         local_tool_boxes = [
-            "Zed_tools",
+            "Graves_tools",
         ]
         local_tools, local_tools_registry = load_all_tools_from_local_toolboxes(local_tool_boxes)
         #声明本地部署MCP Server + SSE远端MCP Server

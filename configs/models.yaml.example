@@ -1,10 +1,17 @@
-# manage api_key for LLM brain of agents
-Zed_agent_model_config:
+#------------------------------------------------------
+# manage api_key of LLM that agents will use
+#------------------------------------------------------
+Zed:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "your api key"
 
-Sara_agent_model_config:
+Sara:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "your api key"
+
+Graves:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "your api key"

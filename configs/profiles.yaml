@@ -21,6 +21,18 @@ Sara:
     nick_name: "Job Hunter - Sara"
     description: "Auto-apply for jobs (automatically applies on major platforms based on your resume)"
 
+Graves:
+  avatar: "./assets/avatar/Graves.jpg"
+  zh:
+    type: "文本任务"
+    nick_name: "格雷福斯"
+    description: "为你做简历"
+  en:
+    type: "Text Task"
+    nick_name: "Graves"
+    description: "Make resume for you"
+
+# 以下为 Demo 补充
 Riven:
   avatar: "./assets/avatar/Riven.jpg"
   zh:
@@ -54,7 +66,6 @@ Catherine:
     nick_name: "Catherine"
     description: "Example Show"
 
-# 以下为 Demo 补充
 Akali:
   avatar: "./assets/avatar/Akali.jpg"
   zh:

@@ -1,15 +1,23 @@
+#------------------------------------------------------
 # manage api_key of local defined tools
-Zed_embedding_model_config:
+#------------------------------------------------------
+Zed_embedding:
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   model: "text-embedding-v4"
   api_key: "your api key"
 
-Zed_writer_model_config:
+Zed_writer:
   base_url: "https://api.deepseek.com"
   model: "deepseek-reasoner"
   api_key: "your api key"
 
-Sara_job_filter_generate_model_config:
+Sara_job_filter_generator:
   base_url: "https://api.deepseek.com"
-  model: "deepseek-reasoner"
+  model: "deepseek-chat"
+  api_key: "your api key"
+
+# model really matters on the performance if you want a nice cv
+Graves_cv_generator:
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  model: "qwen3.5-flash"
   api_key: "your api key"

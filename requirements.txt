@@ -5,8 +5,7 @@ openai
 mcp
 
 selenium
-undetected_chromedriver
-webdriver_manager
+DrissionPage
 fake_useragent
 
 pyyaml

@@ -7,12 +7,12 @@ from openai import OpenAI
 import chromadb
 from chromadb.config import Settings
 from utils.com import qprint, request_LLM_api
-from utils.config import load_model_config
+from utils.config import load_tool_config
 from globals import globals
 
 #-----------------API KEY配置区域--------------------------------
-writer_model_config = load_model_config("Zed_writer_model_config")
-Zed_embedding_model_config = load_model_config("Zed_embedding_model_config")
+writer_model_config = load_tool_config("Zed_writer")
+Zed_embedding_model_config = load_tool_config("Zed_embedding")
 # 测试打印一下
 if writer_model_config:
     print(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {writer_model_config.get('model')}")
