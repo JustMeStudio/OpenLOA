@@ -6,17 +6,21 @@ import time
 import asyncio
 from utils.com import qprint, chat
 from utils.mcp import MCPToolSession, load_all_tools_from_MCP_servers, load_all_tools_from_local_toolboxes
-from utils.config import load_model_config
+from utils.config import load_model_config, load_user_settings
 from globals import globals
 
-# 防止前端输出乱码
+# in case of encoding issues in the terminal
 sys.stdout.reconfigure(encoding="utf-8", newline=None)
+
+#-------------------------user settings config--------------------------------------
+user_settings = load_user_settings()
+language = user_settings.get("language", "en")
 
 #--------------------------API KEY config-------------------------------------------
 agent_model_config = load_model_config("Graves")
 # 测试打印一下
 if agent_model_config:
-    print(f"成功加载配置，正在使用模型: {agent_model_config.get('model')}")
+    print(f"Current model: {agent_model_config.get('model')}")
 
 #-----------------------system prompt config-------------------------------------
 system_prompt = """# 角色设定
@@ -43,13 +47,16 @@ system_prompt = """# 角色设定
 #--------------------------------------------------------------------------------
 async def main():
     try:
-        #开场白
-        qprint("我是墨菲特，我可以帮你制作简历！\n告诉我你的")
+        # self-introduction
+        if language == "en":
+            qprint("Hi! I'm Graves, your personal resume assistant. I can create a professional and visually appealing resume for you.\n\n1. Please provide me with detailed information about yourself, including your basic info, education, work experience, projects, skills, certifications, etc.\n2. Let me know your preferred resume style (e.g., classic business, minimalist tech, academic, creative colorful) so I can tailor the layout to your liking.\n3. If you haven't uploaded a profile picture yet, I recommend doing so to make your resume look more polished and professional. I can automatically embed it into the resume for you!\n4. Once I have all the necessary information and style preferences, I'll generate a high-quality personalized resume for you!")
+        if language == "zh":
+            print("我是格雷福斯，我可以为你制作简历！\n1.向我描述一下你的基本信息，越详细越好（包括教育经历、工作经历、项目经验、技能特长等）\n2.告诉我你喜欢的简历风格（比如：经典商务、互联网极简、学术严谨、创意彩色等）\n3.最好提供给我一张你的证件照（本地完整路径或网络url），这样可以让你的简历看起来更专业哦！\n4.当你准备好后，我会帮你生成一份高质量的个性化简历！")
 
         #为本次项目创建资源目录(如果后续需要保存结果到本地)
         # time_stamp = str(int(time.time()))
         globals.PROJECT_NAME = project_name = f"Graves"
-        globals.PROJECT_FILE_NAME = project_file_name = "简历.html"
+        globals.PROJECT_FILE_NAME = project_file_name = "resume.html"
         globals.PROJECT_PATH = project_path = os.path.abspath(f"./projects/{project_name}")
         globals.PROJECT_FILE_PATH = os.path.abspath(f"{project_path}/{project_file_name}")
 
@@ -72,19 +79,19 @@ async def main():
         tools_registry = local_tools_registry | mcp_registry
         #列举所有工具
         tools_names = "\n".join(tools_registry.keys())
-        qprint(f"已拥有的工具：\n{tools_names}")
+        qprint(f"Tools i've got：\n{tools_names}")
 
-        qprint("我已加入战场!")
+        qprint("I'me ready!")
         #开始对话
         try:
             await chat(agent_model_config, system_prompt, tools, tools_registry)
         finally:
-            qprint("正在尝试结束会话进程......")
+            qprint("Trying to close MCP sessions......")
             for mcp in mcp_sessions:
                 await mcp.close()
-            qprint("会话进程已结束......")
+            qprint("MCP sessions closed......")
     except Exception as e:
-        qprint(f"后端启动失败: {e}")
+        qprint(f"Error occurred: {e}")
         raise
 
 

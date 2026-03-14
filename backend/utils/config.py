@@ -8,6 +8,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MODEL_CONFIG_PATH = BASE_DIR / "configs" / "models.yaml"
 TOOL_CONFIG_PATH = BASE_DIR / "configs" / "tools.yaml"
+SETTINGS_PATH = BASE_DIR / "configs" / "settings.yaml"
+
 
 def load_model_config(config_name):
     try:
@@ -34,6 +36,17 @@ def load_tool_config(tool_name):
             return all_configs.get(tool_name, {})
     except FileNotFoundError:
         print(f"❌ 错误：找不到配置文件 {TOOL_CONFIG_PATH}")
+        return {}
+    except Exception as e:
+        print(f"❌ 读取配置出错: {e}")
+        return {}
+    
+def load_user_settings():
+    try:
+        with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    except FileNotFoundError:
+        print(f"❌ 错误：找不到配置文件 {SETTINGS_PATH}")
         return {}
     except Exception as e:
         print(f"❌ 读取配置出错: {e}")

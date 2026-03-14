@@ -15,9 +15,9 @@ writer_model_config = load_tool_config("Zed_writer")
 Zed_embedding_model_config = load_tool_config("Zed_embedding")
 # 测试打印一下
 if writer_model_config:
-    print(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {writer_model_config.get('model')}")
+    qprint(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {writer_model_config.get('model')}")
 if Zed_embedding_model_config:
-    print(f"(向量数据库)成功加载配置，正在使用模型: {Zed_embedding_model_config.get('model')}")
+    qprint(f"(向量数据库)成功加载配置，正在使用模型: {Zed_embedding_model_config.get('model')}")
 #------------------------初始化向量数据库---------------------------
 collection_name = "Zed"
 

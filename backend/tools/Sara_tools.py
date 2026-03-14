@@ -19,7 +19,7 @@ from globals import globals
 filter_generate_model_config = load_tool_config("Sara_job_filter_generator")
 # 测试打印一下
 if filter_generate_model_config:
-    print(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {filter_generate_model_config.get('model')}")
+    qprint(f"(职位过滤条件生成器)成功加载配置，正在使用模型: {filter_generate_model_config.get('model')}")
 
 ########################################## BOSS直聘  ##########################################
 city_code_bosszhipin = {
@@ -96,15 +96,15 @@ def login_bosszhipin():
     options.set_argument('--no-sandbox')
     options.set_argument('--disable-gpu')
     options.auto_port() 
-    print("🛠️ 正在初始化浏览器引擎...")
+    qprint("🛠️ 正在初始化浏览器引擎...")
     page = ChromiumPage(options)
-    print("✨ 浏览器初始化完毕，准备就绪！")
+    qprint("✨ 浏览器初始化完毕，准备就绪！")
     try:
-        print("🌐 浏览器即将打开，请在窗口弹出后进行扫码或验证码登录...")
+        qprint("🌐 浏览器即将打开，请在窗口弹出后进行扫码或验证码登录...")
         # 访问登录页
         page.get("https://www.zhipin.com/web/user/?ka=header-login") 
-        print("💡 [提示] 请在打开的浏览器中手动登录 BOSS 直聘。")
-        print("⏳ 我会在这里一直守护你，直到检测到登录跳转... ☕")
+        qprint("💡 [提示] 请在打开的浏览器中手动登录 BOSS 直聘。")
+        qprint("⏳ 我会在这里一直守护你，直到检测到登录跳转... ☕")
         initial_url = page.url
         timeout = 300  # 5分钟
         poll_interval = 2
@@ -114,24 +114,24 @@ def login_bosszhipin():
             current_url = page.url
             # 逻辑：如果 URL 发生了变化，通常意味着从登录页跳转到了首页或管理页
             if "login" not in current_url and current_url != initial_url:
-                print("🎉 恭喜您，登录成功！")
-                print("🚀 现在你可以最小化浏览器，剩下的繁琐工作交给我来处理就好啦~")
+                qprint("🎉 恭喜您，登录成功！")
+                qprint("🚀 现在你可以最小化浏览器，剩下的繁琐工作交给我来处理就好啦~")
                 login_flag = True
                 break
             # 每隔 10 秒刷一个“等候中”的日志，防止控制台看起来像死掉了一样
             if elapsed_time % 10 == 0 and elapsed_time > 0:
-                print(f"🕒 已经等待了 {elapsed_time} 秒，还在守候您的登录信号...")
+                qprint(f"🕒 已经等待了 {elapsed_time} 秒，还在守候您的登录信号...")
             time.sleep(poll_interval)
             elapsed_time += poll_interval
         if login_flag:
             return {"result": "succeed", "page": page}
         else:
-            print("⏰ 5分钟时间已到，您似乎还没有完成登录。")
-            print("🛑 为了节省资源，我已自动安全关闭浏览器，请稍后重试。")
+            qprint("⏰ 5分钟时间已到，您似乎还没有完成登录。")
+            qprint("🛑 为了节省资源，我已自动安全关闭浏览器，请稍后重试。")
             page.quit() # 超时自动关闭是个好习惯
             return {"result": "failed", "failure": "Login not completed within timeout period."}        
     except Exception as e:
-        print(f"🚨 糟糕，登录流程发生了意外中断: {e}")
+        qprint(f"🚨 糟糕，登录流程发生了意外中断: {e}")
         return {"result": "failed", "failure": str(e)}
         
 #自动识别txt, pdf, word文档，并返回文本内容
@@ -173,30 +173,30 @@ def scroll_to_bottom_like_user(page, times=10, pause=1.5):
     """
     修正版：模拟真人浏览加载内容
     """
-    print("🚀 开始模拟真人浏览加载内容...")
+    qprint("🚀 开始模拟真人浏览加载内容...")
     for i in range(times):
         # ✅ 正确获取滚动前的位置：使用 page.rect.scroll_position[1]
         prev_pos = page.rect.scroll_position[1]
         # 模拟真人滚动：向下滚动一段距离（带点随机，防止被识别）
         scroll_step = random.randint(2000, 3000)
         page.scroll.down(scroll_step)
-        print(f"已向下滚动 {scroll_step}px，当前是第 {i+1} 次尝试")
+        qprint(f"已向下滚动 {scroll_step}px，当前是第 {i+1} 次尝试")
         # 留出加载时间
         time.sleep(pause + random.random()) # 增加随机抖动时间
         # ✅ 再次获取当前位置进行对比
         curr_pos = page.rect.scroll_position[1]
         # 如果位置没变，说明可能触底了或者加载卡住了
         if curr_pos <= prev_pos:
-            print("检测到滚动停止，尝试强力触底确认...")
+            qprint("检测到滚动停止，尝试强力触底确认...")
             page.scroll.to_bottom()
             time.sleep(2)
             if page.rect.scroll_position[1] <= curr_pos:
-                print("✅ 已经到达真正的底部，所有内容加载完毕")
+                qprint("✅ 已经到达真正的底部，所有内容加载完毕")
                 break
             else:
-                print("发现新内容加载，继续滚动...")
+                qprint("发现新内容加载，继续滚动...")
     else:
-        print("⚠️ 已达到最大尝试次数，停止滚动")
+        qprint("⚠️ 已达到最大尝试次数，停止滚动")
 
 
 #直接URL传参过滤职位
@@ -224,17 +224,17 @@ def filter_jobs_by_url(page, requirement):
             else:
                 params[param_name] = code_map[val]
         except KeyError:
-            print(f"⚠️ 警告：找不到 {key} 对应的编码 - {val}")
+            qprint(f"⚠️ 警告：找不到 {key} 对应的编码 - {val}")
     # 2. 处理特殊的关键词参数
     if "岗位关键词" in requirement:
         params["query"] = requirement["岗位关键词"]
     # 3. 使用 urlencode 自动处理 URL 编码（处理特殊字符、空格等）
     final_url = base_url + urlencode(params)
-    print(f"🔗 生成的筛选链接: {final_url}")
+    qprint(f"🔗 生成的筛选链接: {final_url}")
     page.get(final_url)
     # 4. DrissionPage 特有的等待：等待页面主体出现
     page.wait.ele_displayed('.job-list-container', timeout=10)
-    print("✅ 已完成 URL 过滤设置，开始后续操作...")
+    qprint("✅ 已完成 URL 过滤设置，开始后续操作...")
     return True
 
 
@@ -280,11 +280,11 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
         # if card:
         #     with open('card_debug.txt', 'w', encoding='utf-8') as f:
         #         f.write(card.html)
-        #     print("✅ 卡片源码已写入 card_debug.txt，直接打开这个文件看 HTML 结构。")
+        #     qprint("✅ 卡片源码已写入 card_debug.txt，直接打开这个文件看 HTML 结构。")
 
         # 4. 定位所有职位卡片容器 (实时操作容器，防止对象失效)
         job_cards = page.eles('.card-area')
-        print(f"📊 目前一共找到 {len(job_cards)} 个职位卡片")
+        qprint(f"📊 目前一共找到 {len(job_cards)} 个职位卡片")
         for card in job_cards:
             if chat_count >= num_chat_per_requirement:
                 break
@@ -322,13 +322,13 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                         "岗位要求": tags,
                         "链接": job_link
                     }
-                print(f"🔍 成功解析: {job_name} | {comp_name} | {job_area}")
+                qprint(f"🔍 成功解析: {job_name} | {comp_name} | {job_area}")
 
                 # 过滤已投递
                 if info["链接"] in records_set:
-                    print(f"⏭️ 链接已匹配，跳过已处理职位: {info['岗位名称']}")
+                    qprint(f"⏭️ 链接已匹配，跳过已处理职位: {info['岗位名称']}")
                     continue
-                print(f"🚀 正在尝试投递: {info['岗位名称']} @ {info['公司名称']}")
+                qprint(f"🚀 正在尝试投递: {info['岗位名称']} @ {info['公司名称']}")
                 # 点击卡片进入详情 (Boss直聘通常在当前页右侧打开详情，或者弹出层)
                 card.click()
                 page.wait(1.5, 3)
@@ -336,7 +336,7 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                 # 注意：Boss有时按钮在卡片上，有时在详情侧边栏，DP会自动寻找可见的
                 chat_btn = page.ele('text=立即沟通', timeout=3)
                 if not chat_btn:
-                    print(f"🕵️ 未找到沟通按钮或已沟通，跳过...")
+                    qprint(f"🕵️ 未找到沟通按钮或已沟通，跳过...")
                     continue
                 chat_btn.click()
                 page.wait(1, 2)
@@ -345,7 +345,7 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                 stay_btn = page.ele('text=留在此页', timeout=2)
                 if stay_btn:
                     stay_btn.click()
-                    print("✅ 成功发送招呼！")
+                    qprint("✅ 成功发送招呼！")
                     page.wait(1, 2)
                     save_record(info)
                     chat_count += 1
@@ -353,7 +353,7 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                     # 2. 检查是否有“个人中心”按钮（通常是简历不匹配、打招呼频繁等拦截）
                     personal_btn = page.ele('text=个人中心', timeout=1)
                     if personal_btn:
-                        print(f"⚠️ 触发拦截提示（简历不匹配等），执行“跳转并秒关”策略...")
+                        qprint(f"⚠️ 触发拦截提示（简历不匹配等），执行“跳转并秒关”策略...")
                         personal_btn.click() # 此时会弹出一个新标签页
                         # 3. 处理新弹出的标签页
                         new_tab_id = page.wait.new_tab()
@@ -361,11 +361,11 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                             new_tab = page.get_tab(new_tab_id)
                             # 验证一下 URL，确保没关错
                             if "geek/recommend" in new_tab.url:
-                                print(f"🚀 已捕获个人中心页面 ({new_tab.url})，正在关闭...")
+                                qprint(f"🚀 已捕获个人中心页面 ({new_tab.url})，正在关闭...")
                                 new_tab.close()
-                                print("✨ 弹窗已成功通过“跳转-关闭”逻辑清理")
+                                qprint("✨ 弹窗已成功通过“跳转-关闭”逻辑清理")
                             else:
-                                print("⚠️ 捕获到的标签页 URL 不符，跳过关闭步骤")
+                                qprint("⚠️ 捕获到的标签页 URL 不符，跳过关闭步骤")
                         # 4. 回到主页面后，由于逻辑已经完成，警告框通常会消失
                         # 建议加一个小的随机等待，给 DOM 刷新的时间
                         time.sleep(random.uniform(1, 2))
@@ -374,31 +374,31 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                         other_tips = page.ele('text=我知道了', timeout=1) or page.ele('text=确定', timeout=1)
                         if other_tips:
                             other_tips.click()
-                            print(f"👌 已处理常规弹窗: {other_tips.text}")
+                            qprint(f"👌 已处理常规弹窗: {other_tips.text}")
                 # 随机避开风控
                 time.sleep(random.uniform(3, 6))
-                print(f"⏳ 随机等待几秒钟，准备处理下一个职位...")
+                qprint(f"⏳ 随机等待几秒钟，准备处理下一个职位...")
             except Exception as e:
-                print(f"❌ 处理职位卡片失败: {e}")
+                qprint(f"❌ 处理职位卡片失败: {e}")
                 continue
-        print(f"🎯 任务结束：共完成 {chat_count} 次投递")
+        qprint(f"🎯 任务结束：共完成 {chat_count} 次投递")
         page.get("https://www.zhipin.com/web/geek/jobs") # 重置页面
         return {"chat_count": chat_count}
     except Exception as e:
-        print(f"🚨 关键流程出错: {e}")
+        qprint(f"🚨 关键流程出错: {e}")
         return {"chat_count": chat_count}
 
 
 # 上 Boss 直聘给匹配的 BOSS 们打招呼
 async def apply_on_bosszhipin(cv_path: str, user_instruction: str = ""):
-    print("\n" + "="*50)
-    print("🤖 欢迎使用 BOSS 直聘自动打招呼助手")
-    print("="*50)
+    qprint("\n" + "="*50)
+    qprint("🤖 欢迎使用 BOSS 直聘自动打招呼助手")
+    qprint("="*50)
     # 1. 解析需求
-    print("🧠 正在根据您的简历和要求分析岗位画像...")
+    qprint("🧠 正在根据您的简历和要求分析岗位画像...")
     get_requirements_result = job_requirements_bosszhipin(cv_path, user_instruction)
     if get_requirements_result["result"] == "failed":
-        print("❌ 错误：无法从简历中提取需求，请检查简历路径或内容。")
+        qprint("❌ 错误：无法从简历中提取需求，请检查简历路径或内容。")
         return {"result": "failed", "failure": "failed to extract requirements for jobs"}
     requirements = get_requirements_result["requirements"]
     requirement_list = []
@@ -411,45 +411,45 @@ async def apply_on_bosszhipin(cv_path: str, user_instruction: str = ""):
     # 2. 规划任务
     total_requirements = len(requirement_list)
     num_chat_per_requirement = int(200 / total_requirements)
-    print(f"\n📋 任务规划完成！一共为您准备了 {total_requirements} 组搜索组合：")
-    print("-" * 30)
+    qprint(f"\n📋 任务规划完成！一共为您准备了 {total_requirements} 组搜索组合：")
+    qprint("-" * 30)
     for i, req in enumerate(requirement_list, 1):
-        print(f"  [{i}] 📍{req['城市']} | 🔍{req['岗位关键词']}")
-    print("-" * 30)
-    print(f"💡 [策略] BOSS 每日上限 200 次，每组组合将尝试沟通约 {num_chat_per_requirement} 人。")
+        qprint(f"  [{i}] 📍{req['城市']} | 🔍{req['岗位关键词']}")
+    qprint("-" * 30)
+    qprint(f"💡 [策略] BOSS 每日上限 200 次，每组组合将尝试沟通约 {num_chat_per_requirement} 人。")
     # 3. 登录流程
-    print("\n🌐 正在启动反检测浏览器...")
+    qprint("\n🌐 正在启动反检测浏览器...")
     login_result = login_bosszhipin()
     if login_result["result"] == "failed":
-        print(f"🛑 登录失败，程序终止：{login_result.get('failure')}")
+        qprint(f"🛑 登录失败，程序终止：{login_result.get('failure')}")
         return {"result": "failed", "failure": "Login failed"}
     page = login_result["page"]
     chat_count = 0
     # 4. 循环执行任务
-    print(f"\n🚀 开始执行自动化投递任务，当前共 {total_requirements} 个任务包...")
+    qprint(f"\n🚀 开始执行自动化投递任务，当前共 {total_requirements} 个任务包...")
     for index, requirement in enumerate(requirement_list, 1):
-        print(f"\n{'*'*10} 正在执行第 [{index}/{total_requirements}] 组任务 {'*'*10}")
-        print(f"🚩 当前目标：{requirement['城市']} - {requirement['岗位关键词']}")
+        qprint(f"\n{'*'*10} 正在执行第 [{index}/{total_requirements}] 组任务 {'*'*10}")
+        qprint(f"🚩 当前目标：{requirement['城市']} - {requirement['岗位关键词']}")
         try:
             apply_result = await send_greetings_on_bosszhipin(page, requirement, num_chat_per_requirement)
             chat_count_requirement = apply_result.get("chat_count", 0)
             chat_count += chat_count_requirement
-            print(f"✅ 本组任务完成，成功沟通 {chat_count_requirement} 位 BOSS。")
-            print(f"📈 累计总沟通人数：{chat_count}")
+            qprint(f"✅ 本组任务完成，成功沟通 {chat_count_requirement} 位 BOSS。")
+            qprint(f"📈 累计总沟通人数：{chat_count}")
         except Exception as e:
-            print(f"⚠️ 执行本组任务时发生意外: {e}")
+            qprint(f"⚠️ 执行本组任务时发生意外: {e}")
             continue
     # 5. 任务总结
-    print("\n" + "="*50)
-    print(f"🎊 恭喜！今日所有自动化投递任务已圆满完成！")
-    print(f"📊 最终战报：今日共主动联系 {chat_count} 位 BOSS。")
-    print(f"✨ 祝您早日拿到心仪的 Offer！")
-    print("="*50 + "\n")
+    qprint("\n" + "="*50)
+    qprint(f"🎊 恭喜！今日所有自动化投递任务已圆满完成！")
+    qprint(f"📊 最终战报：今日共主动联系 {chat_count} 位 BOSS。")
+    qprint(f"✨ 祝您早日拿到心仪的 Offer！")
+    qprint("="*50 + "\n")
     return {"successful_chat_count": chat_count}
 
 
 def find_the_real_card(page):
-    print("🕵️ 正在暴力扫描页面所有 div 的类名...")
+    qprint("🕵️ 正在暴力扫描页面所有 div 的类名...")
     # 获取页面所有 div 标签
     all_divs = page.eles('tag:div')
     class_stats = {}
@@ -459,31 +459,31 @@ def find_the_real_card(page):
             # 去掉动态可能变化的空格，记录类名
             class_stats[cls] = class_stats.get(cls, 0) + 1
     # 职位列表通常是 15, 30 或 60 个
-    print("\n--- 重点怀疑对象（出现次数在10-60之间的类名） ---")
+    qprint("\n--- 重点怀疑对象（出现次数在10-60之间的类名） ---")
     found = False
     for cls, count in class_stats.items():
         if 10 <= count <= 60:
-            print(f"找到类名: {cls} | 出现次数: {count}")
+            qprint(f"找到类名: {cls} | 出现次数: {count}")
             found = True
     if not found:
-        print("❌ 没找到疑似卡片的类名，可能页面根本没加载出来，或者在 iframe 里。")
+        qprint("❌ 没找到疑似卡片的类名，可能页面根本没加载出来，或者在 iframe 里。")
 
 
 def debug_inspect_card_structure(page, selector='.card-area'):
     """
     暴力拆解卡片结构，打印所有层级的类名和内容
     """
-    print(f"🕵️ 正在拆解选择器为 {selector} 的第一个元素...")
+    qprint(f"🕵️ 正在拆解选择器为 {selector} 的第一个元素...")
     # 1. 获取第一个卡片
     card = page.ele(selector)
     if not card:
-        print(f"❌ 错误：在当前页面没找到类名为 {selector} 的元素！")
+        qprint(f"❌ 错误：在当前页面没找到类名为 {selector} 的元素！")
         return
     # 2. 获取该元素下所有的子孙元素
     all_descendants = card.eles('xpath:.//*')
-    print("-" * 50)
-    print(f"根容器 HTML: {card.tag} class='{card.attr('class')}'")
-    print("-" * 50)
+    qprint("-" * 50)
+    qprint(f"根容器 HTML: {card.tag} class='{card.attr('class')}'")
+    qprint("-" * 50)
     # 3. 遍历并打印结构
     for idx, el in enumerate(all_descendants):
         tag = el.tag
@@ -491,9 +491,9 @@ def debug_inspect_card_structure(page, selector='.card-area'):
         text = el.text.strip().replace('\n', ' ')[:30] # 只取前30个字
         # 打印层级感（简单的缩进辅助观察）
         indent = "  " 
-        print(f"[{idx:02d}] {indent}标签: <{tag}> | 类名: {cls} | 文本: {text}")
-    print("-" * 50)
-    print("💡 提示：找那些类名里包含 'name', 'title', 'company', 'salary', 'addr' 的行。")
+        qprint(f"[{idx:02d}] {indent}标签: <{tag}> | 类名: {cls} | 文本: {text}")
+    qprint("-" * 50)
+    qprint("💡 提示：找那些类名里包含 'name', 'title', 'company', 'salary', 'addr' 的行。")
 
 
 ###########################################     工具注册    #############################################################
