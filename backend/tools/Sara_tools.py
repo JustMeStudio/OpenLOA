@@ -339,12 +339,14 @@ async def send_greetings_on_bosszhipin(page: ChromiumPage, requirement: dict, nu
                     print(f"🕵️ 未找到沟通按钮或已沟通，跳过...")
                     continue
                 chat_btn.click()
+                page.wait(1, 2)
                 # 6. 处理沟通后的状态            
                 # 1. 尝试寻找“留在此页”按钮（成功投递的情况）
                 stay_btn = page.ele('text=留在此页', timeout=2)
                 if stay_btn:
                     stay_btn.click()
                     print("✅ 成功发送招呼！")
+                    page.wait(1, 2)
                     save_record(info)
                     chat_count += 1
                 else:
