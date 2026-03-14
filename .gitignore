@@ -2,6 +2,7 @@
 # 排除你提到的本地项目存储和向量数据库
 backend/projects/
 backend/chroma_db/
+backend/prompt.txt
 
 # 忽略包含私密 Key 的真实配置文件
 configs/models.yaml
