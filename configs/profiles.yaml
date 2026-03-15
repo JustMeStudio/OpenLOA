@@ -2,35 +2,35 @@
 Zed:
   avatar: "./assets/avatar/Zed.jpg"
   zh:
-    type: "文本任务"
-    nick_name: "影分身-劫"
-    description: "替你写汇报（会仿造你以前的文字风格的那种）"
+    type: "文档创作"
+    nick_name: "劫"
+    description: "替你写文章（仿造你以前的文字风格）"
   en:
-    type: "Text Task"
-    nick_name: "Shadow Dash - Zed"
-    description: "Write reports for you (mimics your writing style)"
+    type: "Document Creation"
+    nick_name: "Zed"
+    description: "Write articles for you (mimics your writing style)"
 
 Sara:
   avatar: "./assets/avatar/Sara.jpg"
   zh:
-    type: "浏览器任务"
-    nick_name: "职位猎人-沙拉"
-    description: "自动投简历（自动根据你的简历内容投，各大平台投）"
+    type: "求职招聘"
+    nick_name: "沙拉"
+    description: "帮你在BOSS直聘上找岗位并给BOSS打招呼"
   en:
-    type: "Browser Task"
-    nick_name: "Job Hunter - Sara"
-    description: "Auto-apply for jobs (automatically applies on major platforms based on your resume)"
+    type: "Job & Recruitment"
+    nick_name: "Sara"
+    description: "Auto-apply for jobs on BOSS Zhipin"
 
 Graves:
   avatar: "./assets/avatar/Graves.jpg"
   zh:
-    type: "文本任务"
+    type: "求职招聘"
     nick_name: "格雷福斯"
-    description: "为你做简历"
+    description: "为你量身定制精美的简历"
   en:
-    type: "Text Task"
+    type: "Job & Recruitment"
     nick_name: "Graves"
-    description: "Make resume for you"
+    description: "Make a fantastic resume for you"
 
 # 以下为 Demo 补充
 Riven:

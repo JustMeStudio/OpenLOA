@@ -3,12 +3,16 @@ PySide6
 openai
 mcp
 
+playwright    # playwright install chromium
+
 DrissionPage
 fake_useragent
 
 pyyaml
 pymupdf
 python-docx
+openpyxl
+pandas
 
 python-ulid
 

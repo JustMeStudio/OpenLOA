@@ -21,7 +21,7 @@ def run_launcher():
 
     # 2. 读取语言设置
     settings = load_yaml(settings_path)
-    lang = settings.get("language", "zh") if settings else "zh"
+    lang = settings.get("language", "en") if settings else "en"
 
     # 3. 读取 Agent Profiles
     profiles = load_yaml(profiles_path)
