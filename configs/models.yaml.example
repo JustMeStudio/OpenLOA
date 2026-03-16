@@ -15,3 +15,8 @@ Graves:
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   api_key: "your api key"
+
+Gangplank:
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  api_key: "your api key"

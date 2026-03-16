@@ -32,6 +32,19 @@ Graves:
     nick_name: "Graves"
     description: "Make a fantastic resume for you"
 
+Gangplank:
+  avatar: "./assets/avatar/Gangplank.jpg"
+  zh:
+    type: "求职招聘"
+    nick_name: "普朗克"
+    description: "帮你批量评分简历，找出最匹配的候选人"
+  en:
+    type: "Job & Recruitment"
+    nick_name: "Gangplank"
+    description: "Bulk rate CVs and find the best candidates for you"
+
+
+
 # 以下为 Demo 补充
 Riven:
   avatar: "./assets/avatar/Riven.jpg"

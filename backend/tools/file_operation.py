@@ -3,6 +3,7 @@ import asyncio
 import pandas as pd
 import fitz  # PyMuPDF
 from docx import Document
+from backend.utils.com import qprint
 
 
 # read document file content, support txt, md, csv, pdf, docx, xlsx, xls
@@ -49,6 +50,15 @@ def _read_content(file_path, ext):
         return f"读取文件 {file_path} 时出错: {str(e)}"
     
 
+# list directory files tool
+async def list_files_in_directory(directory: str):
+    """工具函数：列出指定目录下的所有文件，返回文件名列表"""
+    try:
+        files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+        return {"result": "succeed", "files": files}
+    except Exception as e:
+        qprint(f"⚠️ 列目录失败 ({directory}): {e}")
+        return {"result": "failed", "failure": str(e)}
 #--------------------------------------------------------------------------------
 tool_registry = {
     "read_document": read_document,
@@ -69,6 +79,23 @@ tools = [
                     }
                 },
                 "required": ["file_path"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "list_files_in_directory",
+            "description": "列出指定目录下的所有文件，返回文件名列表",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "directory": {
+                        "type": "string",
+                        "description": "要列出文件的目录路径"
+                    }
+                },
+                "required": ["directory"]
             }
         }
     }
